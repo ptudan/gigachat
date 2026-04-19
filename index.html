@@ -1,0 +1,1467 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gigachat</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101218;
+        --panel: #161b25;
+        --panel-soft: #1e2430;
+        --border: #31394b;
+        --text: #e7eaf3;
+        --muted: #9da7bb;
+        --accent: #6ea8ff;
+        --danger: #f66;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        height: 100vh;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top, #1d2434 0%, var(--bg) 55%);
+        overflow: hidden;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        height: 100vh;
+      }
+
+      aside {
+        border-right: 1px solid var(--border);
+        background: #0f141f;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      main {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .panel {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .identity {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .profile-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .identity code {
+        font-size: 13px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .icon-btn {
+        margin-left: auto;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .avatar-preview-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .avatar-trigger {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+      }
+
+      .avatar-face {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .avatar-face svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .avatar-editor-popover {
+        margin-top: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #11192a;
+        padding: 8px;
+        display: none;
+      }
+
+      .avatar-editor-popover.open {
+        display: block;
+      }
+
+      .avatar-editor-grid {
+        display: grid;
+        gap: 6px;
+      }
+
+      .avatar-slider-label {
+        font-size: 11px;
+        color: var(--muted);
+        display: block;
+      }
+
+      button {
+        background: var(--panel-soft);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: var(--accent);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .danger {
+        border-color: #7d2c2c;
+        color: #ffb6b6;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        background: #0e1320;
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 9px 10px;
+      }
+
+      textarea {
+        resize: none;
+        min-height: 70px;
+      }
+
+      #messageInput {
+        min-height: 52px;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+
+      .topics {
+        overflow-y: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .topic {
+        border: 1px solid var(--border);
+        background: #121928;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: left;
+      }
+
+      .topic.active {
+        border-color: var(--accent);
+        background: #1a2438;
+      }
+
+      .topic-title {
+        font-weight: 600;
+      }
+
+      .topic-meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .room-sort {
+        margin-top: 6px;
+      }
+
+      .checkbox-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .checkbox-row input[type="checkbox"] {
+        margin: 0;
+      }
+
+      .create-room-row {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .header {
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .relay-info {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      #messages {
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .message {
+        padding: 4px 6px;
+        border-radius: 8px;
+      }
+
+      .message:hover {
+        background: rgba(124, 153, 207, 0.08);
+      }
+
+      .message-meta {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .message-author {
+        color: #8fc4ff;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .message-author-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .message-time {
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .message-content {
+        white-space: pre-wrap;
+        line-height: 1.38;
+        word-break: break-word;
+        margin-top: 2px;
+      }
+
+      .message-count {
+        background: transparent;
+        border: 0;
+        padding: 0;
+        margin-left: 2px;
+        cursor: pointer;
+        color: #8aa6d8;
+        font-size: 11px;
+      }
+
+      .message-count:hover {
+        color: #bed8ff;
+        text-decoration: underline;
+      }
+
+      .composer {
+        border-top: 1px solid var(--border);
+        padding: 12px 14px;
+        background: #101625;
+      }
+
+      .composer .row {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .tiny {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .notice {
+        color: var(--muted);
+        padding: 24px 10px;
+        text-align: center;
+      }
+
+      .thread-overlay {
+        position: absolute;
+        right: 18px;
+        bottom: 96px;
+        width: min(560px, calc(100% - 32px));
+        max-height: 70vh;
+        border: 1px solid var(--accent);
+        background: rgba(12, 18, 31, 0.94);
+        backdrop-filter: blur(4px);
+        border-radius: 12px;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .thread-overlay.open {
+        display: flex;
+      }
+
+      .thread-header {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .thread-body {
+        overflow-y: auto;
+        padding: 8px;
+      }
+
+      .thread-composer {
+        border-top: 1px solid var(--border);
+        padding: 8px;
+        background: rgba(15, 23, 38, 0.92);
+      }
+
+      #threadMessageInput {
+        min-height: 44px;
+        max-height: 96px;
+        overflow-y: auto;
+      }
+
+      .thread-node {
+        border: 1px solid rgba(124, 153, 207, 0.25);
+        background: rgba(16, 24, 40, 0.76);
+        border-radius: 8px;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        cursor: pointer;
+      }
+
+      .thread-node:hover {
+        border-color: rgba(153, 186, 245, 0.55);
+        background: rgba(20, 31, 52, 0.9);
+      }
+
+      .thread-children {
+        margin-top: 4px;
+        padding-left: 12px;
+        border-left: 1px dashed #3b4a65;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .advanced-fab {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        padding: 0;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 30;
+      }
+
+      .advanced-panel {
+        position: fixed;
+        right: 14px;
+        bottom: 50px;
+        width: min(360px, calc(100vw - 24px));
+        max-height: 70vh;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        background: rgba(11, 17, 28, 0.97);
+        border-radius: 10px;
+        padding: 10px;
+        display: none;
+        z-index: 30;
+      }
+
+      .advanced-panel.open {
+        display: block;
+      }
+
+      .advanced-panel h4 {
+        margin: 4px 0 6px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside>
+        <section class="panel identity">
+          <div class="profile-row">
+            <button id="profileAvatarTrigger" class="avatar-trigger" type="button" title="Edit avatar">
+              <span id="profileAvatarPreview" class="avatar-face"></span>
+            </button>
+            <code id="identityCode"></code>
+            <button id="regenIdentity" class="icon-btn" type="button" title="New name">↻</button>
+          </div>
+          <div id="avatarEditorPopover" class="avatar-editor-popover">
+            <div class="avatar-editor-grid">
+              <select id="avatarEyes"></select>
+              <select id="avatarMouth"></select>
+              <label class="avatar-slider-label">Red <input id="avatarRed" type="range" min="0" max="255" /></label>
+              <label class="avatar-slider-label">Green <input id="avatarGreen" type="range" min="0" max="255" /></label>
+              <label class="avatar-slider-label">Blue <input id="avatarBlue" type="range" min="0" max="255" /></label>
+              <label class="avatar-slider-label">Hex <input id="avatarHexInput" type="text" placeholder="#ffd166" maxlength="7" /></label>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <strong>Start a room</strong>
+          <input id="newTopicName" type="text" placeholder="Room name (ex: NFL Draft Live)" />
+          <textarea id="newTopicAbout" placeholder="What are people reacting to?"></textarea>
+          <div class="create-room-row">
+            <button id="createTopic" type="button">Start room</button>
+            <label class="tiny checkbox-row">
+              <span>unlisted</span>
+              <input id="newTopicUnlisted" type="checkbox" />
+            </label>
+          </div>
+          <div id="unlistedWarning" class="tiny hidden" style="color: #ffb6b6">Unlisted is NOT private. Anyone with the room code or link can join.</div>
+        </section>
+
+        <section class="panel room-sort">
+          <strong>Sort rooms</strong>
+          <select id="roomSortMode" style="margin-top: 8px">
+            <option value="newest">Newest</option>
+            <option value="active">Recently active</option>
+            <option value="hot">Most active</option>
+          </select>
+        </section>
+
+        <section class="topics" id="topics"></section>
+      </aside>
+
+      <main>
+        <section class="header">
+          <div>
+            <strong id="topicName">Pick a room to jump in</strong>
+            <div class="relay-info" id="topicMeta"></div>
+          </div>
+          <div class="tiny" id="status">Getting ready...</div>
+        </section>
+
+        <section id="messages">
+          <div class="notice">Start a room or join one and share your live takes.</div>
+        </section>
+
+        <section class="composer">
+          <textarea id="messageInput" placeholder="Drop your take..."></textarea>
+          <div class="row">
+            <button id="sendMessage" type="button">Send</button>
+          </div>
+        </section>
+
+        <section class="thread-overlay" id="threadOverlay">
+          <div class="thread-header">
+            <strong>Game thread</strong>
+            <button id="closeThread" type="button">Close</button>
+          </div>
+          <div class="thread-body" id="threadBody"></div>
+          <div class="thread-composer">
+            <div id="threadReplyHint" class="tiny"></div>
+            <textarea id="threadMessageInput" placeholder="Reply in thread..."></textarea>
+            <div class="row">
+              <button id="sendThreadMessage" type="button">Send</button>
+              <button id="cancelThreadReply" type="button">Reply to top</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <button id="advancedToggle" class="advanced-fab" type="button" title="Advanced settings">⚙</button>
+    <section id="advancedPanel" class="advanced-panel">
+      <h4>Advanced settings</h4>
+      <p class="tiny">Most users can ignore this.</p>
+
+      <h4>Connection settings</h4>
+      <textarea id="relayInput"></textarea>
+      <div style="display: flex; gap: 8px; margin-top: 8px">
+        <button id="saveRelays" type="button">Save settings</button>
+        <button id="reconnect" type="button">Reconnect</button>
+      </div>
+
+      <h4 style="margin-top: 12px">Join room by code</h4>
+      <input id="joinTopicId" type="text" placeholder="Paste room code" />
+      <button id="joinTopic" type="button" style="margin-top: 8px">Join room</button>
+    </section>
+
+    <script type="module">
+      import { SimplePool, finalizeEvent, generateSecretKey, getPublicKey, nip19 } from "https://esm.sh/nostr-tools@2.10.4";
+
+      const STORAGE_KEYS = {
+        nsec: "gigachat:nsec",
+        relays: "gigachat:relays",
+        avatar: "gigachat:avatar",
+      };
+
+      const DEFAULT_RELAYS = [
+        "wss://relay.damus.io",
+        "wss://relay.primal.net",
+        "wss://nos.lol",
+      ];
+      const HANDLE_ADJECTIVES = ["Clutch", "Electric", "Loud", "Swift", "Bold", "Icy", "Rapid", "Prime", "Wild", "Lucky"];
+      const HANDLE_MASCOTS = ["Falcon", "Slugger", "Rookie", "Captain", "Hustler", "Charger", "Ace", "Comet", "Baller", "MVP"];
+      const APP_ROOM_MARKER_TAG = "gigachat-room-v1";
+      const APP_ROOM_MARKER_FIELD = "gigachat_room_v1";
+      const MESSAGE_FETCH_LIMIT = 220;
+      const MAX_MESSAGES_IN_MEMORY = 320;
+      const MAX_TOP_LEVEL_RENDER = 140;
+      const AVATAR_EYE_COUNT = 9;
+      const AVATAR_MOUTH_COUNT = 9;
+      const AVATAR_TOKEN_RE = /^\[\[ga:e(\d+)m(\d+)h([0-9a-fA-F]{6})\]\]\s*/;
+
+      const pool = new SimplePool();
+      let secretKey = null;
+      let pubkey = "";
+      let relays = [];
+      let topicSub = null;
+      let roomActivitySub = null;
+      let messageSub = null;
+      let currentChannelId = "";
+      let replyTarget = null;
+      let openThreadRootId = null;
+      let myAvatar = { e: 0, m: 0, hex: "ffd166" };
+      let roomSortMode = "newest";
+      let activityRefreshTimer = null;
+
+      const topicsById = new Map();
+      const messagesById = new Map();
+      const roomStats = new Map();
+
+      const identityCode = document.getElementById("identityCode");
+      const relayInput = document.getElementById("relayInput");
+      const topicsEl = document.getElementById("topics");
+      const roomSortModeSelect = document.getElementById("roomSortMode");
+      const topicName = document.getElementById("topicName");
+      const topicMeta = document.getElementById("topicMeta");
+      const status = document.getElementById("status");
+      const messagesEl = document.getElementById("messages");
+      const messageInput = document.getElementById("messageInput");
+      const threadOverlay = document.getElementById("threadOverlay");
+      const threadBody = document.getElementById("threadBody");
+      const threadReplyHint = document.getElementById("threadReplyHint");
+      const threadMessageInput = document.getElementById("threadMessageInput");
+      const advancedToggle = document.getElementById("advancedToggle");
+      const advancedPanel = document.getElementById("advancedPanel");
+      const profileAvatarTrigger = document.getElementById("profileAvatarTrigger");
+      const profileAvatarPreview = document.getElementById("profileAvatarPreview");
+      const avatarEditorPopover = document.getElementById("avatarEditorPopover");
+      const avatarEyesSelect = document.getElementById("avatarEyes");
+      const avatarMouthSelect = document.getElementById("avatarMouth");
+      const avatarRed = document.getElementById("avatarRed");
+      const avatarGreen = document.getElementById("avatarGreen");
+      const avatarBlue = document.getElementById("avatarBlue");
+      const avatarHexInput = document.getElementById("avatarHexInput");
+
+      function setStatus(text) {
+        status.textContent = text;
+      }
+
+      function shorten(v) {
+        if (!v) return "";
+        return v.length > 16 ? `${v.slice(0, 8)}...${v.slice(-6)}` : v;
+      }
+
+      function hashSliceToNumber(hex, start, length) {
+        return Number.parseInt(hex.slice(start, start + length), 16) || 0;
+      }
+
+      function guestHandleFromPubkey(key) {
+        if (!key) return "Guest Fan";
+        const adjective = HANDLE_ADJECTIVES[hashSliceToNumber(key, 0, 8) % HANDLE_ADJECTIVES.length];
+        const mascot = HANDLE_MASCOTS[hashSliceToNumber(key, 8, 8) % HANDLE_MASCOTS.length];
+        const jersey = (hashSliceToNumber(key, key.length - 8, 8) % 900) + 100;
+        return `${adjective} ${mascot} #${jersey}`;
+      }
+
+      function clampIndex(value, length) {
+        const n = Number.parseInt(String(value), 10);
+        if (!Number.isFinite(n) || n < 0) return 0;
+        return n % length;
+      }
+
+      function sanitizeHexColor(value, fallback = "ffd166") {
+        const raw = String(value || "").trim().replace(/^#/, "").toLowerCase();
+        return /^[0-9a-f]{6}$/.test(raw) ? raw : fallback;
+      }
+
+      function rgbToHex(r, g, b) {
+        const toHex = (n) => Math.max(0, Math.min(255, Number.parseInt(String(n), 10) || 0)).toString(16).padStart(2, "0");
+        return `${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+
+      function hexToRgb(hex) {
+        const safeHex = sanitizeHexColor(hex);
+        return {
+          r: Number.parseInt(safeHex.slice(0, 2), 16),
+          g: Number.parseInt(safeHex.slice(2, 4), 16),
+          b: Number.parseInt(safeHex.slice(4, 6), 16),
+        };
+      }
+
+      function normalizeAvatarConfig(config) {
+        return {
+          e: clampIndex(config?.e, AVATAR_EYE_COUNT),
+          m: clampIndex(config?.m, AVATAR_MOUTH_COUNT),
+          hex: sanitizeHexColor(config?.hex),
+        };
+      }
+
+      function fallbackAvatarFromPubkey(key) {
+        const source = key || "0".repeat(64);
+        return {
+          e: hashSliceToNumber(source, 0, 8) % AVATAR_EYE_COUNT,
+          m: hashSliceToNumber(source, 8, 8) % AVATAR_MOUTH_COUNT,
+          hex: sanitizeHexColor(source.slice(16, 22), "ffd166"),
+        };
+      }
+
+      function eyesSvg(index) {
+        const variants = [
+          '<circle cx="7" cy="9" r="1.1" fill="#12263a"/><circle cx="13" cy="9" r="1.1" fill="#12263a"/>',
+          '<ellipse cx="7" cy="9" rx="1.6" ry="1.1" fill="#12263a"/><ellipse cx="13" cy="9" rx="1.6" ry="1.1" fill="#12263a"/>',
+          '<path d="M5.5 9.5h3" stroke="#12263a" stroke-width="1.2" stroke-linecap="round"/><path d="M11.5 9.5h3" stroke="#12263a" stroke-width="1.2" stroke-linecap="round"/>',
+          '<path d="M5.7 9.7l2.5-2.2M8.2 9.7L5.7 7.5" stroke="#12263a" stroke-width="1.1" stroke-linecap="round"/><path d="M11.7 9.7l2.5-2.2M14.2 9.7l-2.5-2.2" stroke="#12263a" stroke-width="1.1" stroke-linecap="round"/>',
+          '<path d="M5.5 9.2c.5-1 2.2-1 2.7 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M11.5 9.2c.5-1 2.2-1 2.7 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/>',
+          '<path d="M5.5 9.8c.6 1 2.1 1 2.7 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M11.5 9.8c.6 1 2.1 1 2.7 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/>',
+          '<circle cx="7" cy="9" r="1.4" fill="#12263a"/><circle cx="13" cy="9" r="1.4" fill="#12263a"/><circle cx="7.4" cy="8.6" r="0.3" fill="#d7f2ff"/><circle cx="13.4" cy="8.6" r="0.3" fill="#d7f2ff"/>',
+          '<path d="M5.7 9.8c.8-2 2.2-2 3 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M11.7 9.8c.8-2 2.2-2 3 0" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/>',
+          '<path d="M5.9 8.3l2.3 2.3M8.2 8.3L5.9 10.6" stroke="#12263a" stroke-width="1.1" stroke-linecap="round"/><path d="M11.9 8.3l2.3 2.3M14.2 8.3l-2.3 2.3" stroke="#12263a" stroke-width="1.1" stroke-linecap="round"/>',
+        ];
+        return variants[clampIndex(index, AVATAR_EYE_COUNT)];
+      }
+
+      function mouthSvg(index) {
+        const variants = [
+          '<path d="M6.4 13.2c1.1 1.8 6.1 1.8 7.2 0" stroke="#12263a" stroke-width="1.2" fill="none" stroke-linecap="round"/>',
+          '<path d="M6.6 14.2c1.2-1.8 5.6-1.8 6.8 0" stroke="#12263a" stroke-width="1.2" fill="none" stroke-linecap="round"/>',
+          '<ellipse cx="10" cy="13.6" rx="2.1" ry="1.4" fill="#12263a"/>',
+          '<path d="M7.1 13.4h5.8" stroke="#12263a" stroke-width="1.3" stroke-linecap="round"/>',
+          '<path d="M7.2 13.1c.9.9 1.6 1.2 2.8 1.2 1.2 0 1.9-.3 2.8-1.2" stroke="#12263a" stroke-width="1.2" fill="none" stroke-linecap="round"/>',
+          '<path d="M7 13.1c.8.6 2 .9 3 .9s2.2-.3 3-.9" stroke="#12263a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M8.8 14.5h2.4" stroke="#12263a" stroke-width="1" stroke-linecap="round"/>',
+          '<path d="M7.2 12.8h5.6v1.8H7.2z" fill="#12263a"/><path d="M8 13.5h4" stroke="#d7f2ff" stroke-width=".7" stroke-linecap="round"/>',
+          '<path d="M8 12.8c.5.5 1.1.8 2 .8.9 0 1.5-.3 2-.8" stroke="#12263a" stroke-width="1.2" fill="none" stroke-linecap="round"/><path d="M7.7 14c.8.4 1.5.6 2.3.6s1.5-.2 2.3-.6" stroke="#12263a" stroke-width="1.1" fill="none" stroke-linecap="round"/>',
+          '<path d="M8.5 13.1c.4-.7 2.6-.7 3 0-.4.8-2.6.8-3 0z" fill="#12263a"/>',
+        ];
+        return variants[clampIndex(index, AVATAR_MOUTH_COUNT)];
+      }
+
+      function avatarSvg(config) {
+        const avatar = normalizeAvatarConfig(config);
+        const fill = `#${avatar.hex}`;
+        return `<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="${fill}" stroke="rgba(8,15,26,.35)" stroke-width="0.7"/>${eyesSvg(avatar.e)}${mouthSvg(avatar.m)}</svg>`;
+      }
+
+      function avatarHtml(config) {
+        return `<span class="avatar-face">${avatarSvg(config)}</span>`;
+      }
+
+      function avatarToken(config) {
+        const avatar = normalizeAvatarConfig(config);
+        return `[[ga:e${avatar.e}m${avatar.m}h${avatar.hex}]]`;
+      }
+
+      function buildEncodedContent(rawText) {
+        return `${avatarToken(myAvatar)} ${rawText}`;
+      }
+
+      function parseEncodedMessage(content, pubkeyForFallback) {
+        const text = content || "";
+        const match = text.match(AVATAR_TOKEN_RE);
+        if (!match) {
+          return {
+            cleanText: text,
+            avatar: fallbackAvatarFromPubkey(pubkeyForFallback),
+          };
+        }
+        const parsedAvatar = normalizeAvatarConfig({
+          e: match[1],
+          m: match[2],
+          hex: match[3],
+        });
+        return {
+          cleanText: text.slice(match[0].length),
+          avatar: parsedAvatar,
+        };
+      }
+
+      function setupAvatarBuilder() {
+        avatarEyesSelect.innerHTML = Array.from({ length: AVATAR_EYE_COUNT }, (_, idx) => `<option value="${idx}">Eyes ${idx}</option>`).join("");
+        avatarMouthSelect.innerHTML = Array.from({ length: AVATAR_MOUTH_COUNT }, (_, idx) => `<option value="${idx}">Mouth ${idx}</option>`).join("");
+      }
+
+      function renderMyAvatarPreview() {
+        profileAvatarPreview.innerHTML = avatarSvg(myAvatar);
+        avatarHexInput.value = `#${myAvatar.hex}`;
+      }
+
+      function syncSlidersFromAvatar() {
+        const rgb = hexToRgb(myAvatar.hex);
+        avatarRed.value = String(rgb.r);
+        avatarGreen.value = String(rgb.g);
+        avatarBlue.value = String(rgb.b);
+      }
+
+      function restoreAvatar() {
+        const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.avatar) || "");
+        if (saved) myAvatar = normalizeAvatarConfig(saved);
+        avatarEyesSelect.value = String(myAvatar.e);
+        avatarMouthSelect.value = String(myAvatar.m);
+        syncSlidersFromAvatar();
+        renderMyAvatarPreview();
+      }
+
+      function parseRelayInput(value) {
+        return value
+          .split(/\n|,/g)
+          .map((v) => v.trim())
+          .filter(Boolean)
+          .filter((v) => v.startsWith("wss://"));
+      }
+
+      function loadRelays() {
+        const stored = localStorage.getItem(STORAGE_KEYS.relays);
+        relays = stored ? parseRelayInput(stored) : DEFAULT_RELAYS;
+        relayInput.value = relays.join("\n");
+      }
+
+      function ensureIdentity() {
+        const existing = localStorage.getItem(STORAGE_KEYS.nsec);
+        if (existing) {
+          const decoded = nip19.decode(existing);
+          if (decoded.type === "nsec") {
+            secretKey = decoded.data;
+          }
+        }
+
+        if (!secretKey) {
+          secretKey = generateSecretKey();
+          const nsec = nip19.nsecEncode(secretKey);
+          localStorage.setItem(STORAGE_KEYS.nsec, nsec);
+        }
+
+        pubkey = getPublicKey(secretKey);
+        identityCode.textContent = guestHandleFromPubkey(pubkey);
+      }
+
+      function safeJsonParse(value) {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return null;
+        }
+      }
+
+      function parseTopicName(channelEvent) {
+        const parsed = safeJsonParse(channelEvent.content);
+        if (parsed && typeof parsed.name === "string" && parsed.name.trim()) {
+          return parsed.name.trim();
+        }
+        return "Untitled room";
+      }
+
+      function isValidRoomId(value) {
+        return typeof value === "string" && /^[0-9a-f]{64}$/i.test(value);
+      }
+
+      function setActiveRoomQueryParam(roomId) {
+        const url = new URL(window.location.href);
+        if (roomId && isValidRoomId(roomId)) {
+          url.searchParams.set("room", roomId);
+        } else {
+          url.searchParams.delete("room");
+        }
+        history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+
+      function isAppRoom(channelEvent) {
+        if (!channelEvent || channelEvent.kind !== 40) return false;
+        const hasMarkerTag = channelEvent.tags.some((tag) => tag[0] === "t" && tag[1] === APP_ROOM_MARKER_TAG);
+        if (hasMarkerTag) return true;
+        const parsed = safeJsonParse(channelEvent.content);
+        return parsed?.appKey === APP_ROOM_MARKER_FIELD;
+      }
+
+      function getChannelIdFromMessage(event) {
+        const channelTag = getTag(event, "e", "channel");
+        if (channelTag?.[1]) return channelTag[1];
+        const firstE = event.tags.find((tag) => tag[0] === "e" && tag[1]);
+        return firstE ? firstE[1] : null;
+      }
+
+      function updateRoomStatsFromMessage(event) {
+        const channelId = getChannelIdFromMessage(event);
+        if (!channelId) return;
+        const current = roomStats.get(channelId) || { lastMessageAt: 0, messageCount: 0, lastMessagePreview: "" };
+        const eventTime = event.created_at || 0;
+        if (eventTime >= current.lastMessageAt) {
+          const parsed = parseEncodedMessage(event.content, event.pubkey);
+          current.lastMessageAt = eventTime;
+          current.lastMessagePreview = parsed.cleanText.trim();
+        }
+        current.messageCount += 1;
+        roomStats.set(channelId, current);
+      }
+
+      function scheduleActivityFeedRefresh() {
+        if (activityRefreshTimer) clearTimeout(activityRefreshTimer);
+        activityRefreshTimer = setTimeout(() => {
+          connectRoomActivityFeed();
+        }, 250);
+      }
+
+      function connectRoomActivityFeed() {
+        if (roomActivitySub) roomActivitySub.close();
+        const roomIds = Array.from(topicsById.keys());
+        if (!roomIds.length) return;
+        roomActivitySub = pool.subscribeMany(
+          relays,
+          [{ kinds: [42], "#e": roomIds, limit: 1200 }],
+          {
+            onevent: (event) => {
+              updateRoomStatsFromMessage(event);
+              if (roomSortMode !== "newest") renderTopics();
+            },
+          },
+        );
+      }
+
+      function connectTopics() {
+        if (topicSub) topicSub.close();
+        if (roomActivitySub) roomActivitySub.close();
+        setStatus("Connecting...");
+        topicSub = pool.subscribeMany(
+          relays,
+          [{ kinds: [40], limit: 200 }],
+          {
+            onevent: (event) => {
+              if (!isAppRoom(event)) return;
+              if (topicsById.has(event.id)) return;
+              topicsById.set(event.id, event);
+              renderTopics();
+              scheduleActivityFeedRefresh();
+            },
+            oneose: () => {
+              setStatus("Live");
+              connectRoomActivityFeed();
+            },
+          },
+        );
+      }
+
+      function renderTopics() {
+        topicsEl.innerHTML = "";
+        const events = Array.from(topicsById.values());
+        events.sort((a, b) => {
+          if (roomSortMode === "active") {
+            const aScore = roomStats.get(a.id)?.lastMessageAt || a.created_at || 0;
+            const bScore = roomStats.get(b.id)?.lastMessageAt || b.created_at || 0;
+            if (bScore !== aScore) return bScore - aScore;
+            return (b.created_at || 0) - (a.created_at || 0);
+          }
+          if (roomSortMode === "hot") {
+            const aCount = roomStats.get(a.id)?.messageCount || 0;
+            const bCount = roomStats.get(b.id)?.messageCount || 0;
+            if (bCount !== aCount) return bCount - aCount;
+            const aLast = roomStats.get(a.id)?.lastMessageAt || a.created_at || 0;
+            const bLast = roomStats.get(b.id)?.lastMessageAt || b.created_at || 0;
+            return bLast - aLast;
+          }
+          return (b.created_at || 0) - (a.created_at || 0);
+        });
+        if (!events.length) {
+          const note = document.createElement("div");
+          note.className = "notice";
+          note.textContent = "No rooms yet. Be the first to start one.";
+          topicsEl.append(note);
+          return;
+        }
+
+        for (const channel of events) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `topic ${channel.id === currentChannelId ? "active" : ""}`;
+          const stats = roomStats.get(channel.id);
+          const preview = stats?.lastMessagePreview ? stats.lastMessagePreview : "No messages yet";
+          const previewText = preview.length > 40 ? `${preview.slice(0, 40)}...` : preview;
+          const when = formatTopicTime(stats?.lastMessageAt || channel.created_at || 0);
+          button.innerHTML = `<div class="topic-title">${escapeHtml(parseTopicName(channel))}</div><div class="topic-meta">${escapeHtml(previewText)} - ${escapeHtml(when)}</div>`;
+          button.addEventListener("click", () => selectTopic(channel.id));
+          topicsEl.append(button);
+        }
+      }
+
+      function getTag(event, name, marker) {
+        return event.tags.find((t) => t[0] === name && (!marker || t[3] === marker));
+      }
+
+      function getMessageParentId(event, channelId) {
+        const replyTag = getTag(event, "e", "reply");
+        if (replyTag) return replyTag[1];
+        const eTags = event.tags.filter((t) => t[0] === "e").map((t) => t[1]).filter(Boolean);
+        const possibleParent = eTags.find((id) => id !== channelId);
+        return possibleParent || null;
+      }
+
+      function computeDepth(id) {
+        const seen = new Set();
+        let depth = 1;
+        let node = messagesById.get(id);
+        while (node && node.parentId) {
+          if (seen.has(node.parentId)) break;
+          seen.add(node.parentId);
+          depth += 1;
+          node = messagesById.get(node.parentId);
+        }
+        return depth;
+      }
+
+      function normalizeMessage(event, channelId) {
+        const parentId = getMessageParentId(event, channelId);
+        const parsed = parseEncodedMessage(event.content, event.pubkey);
+        const message = {
+          id: event.id,
+          event,
+          parentId,
+          cleanContent: parsed.cleanText,
+          avatar: parsed.avatar,
+          depth: 1,
+        };
+        messagesById.set(event.id, message);
+        message.depth = computeDepth(event.id);
+      }
+
+      function selectTopic(channelId) {
+        currentChannelId = channelId;
+        setActiveRoomQueryParam(channelId);
+        replyTarget = null;
+        openThreadRootId = null;
+        threadOverlay.classList.remove("open");
+        messagesById.clear();
+        renderTopics();
+        renderThreadReplyHint();
+        renderMessages();
+
+        const channel = topicsById.get(channelId);
+        topicName.textContent = channel ? parseTopicName(channel) : "Joined room";
+        topicMeta.textContent = "Live room";
+
+        if (messageSub) messageSub.close();
+        messageSub = pool.subscribeMany(
+          relays,
+          [{ kinds: [42], "#e": [channelId], limit: MESSAGE_FETCH_LIMIT }],
+          {
+            onevent: (event) => {
+              if (messagesById.has(event.id)) return;
+              normalizeMessage(event, channelId);
+              updateRoomStatsFromMessage(event);
+              pruneMessageCache();
+              renderMessages();
+              renderThread();
+              if (roomSortMode !== "newest") renderTopics();
+            },
+          },
+        );
+      }
+
+      function replyLabel(target) {
+        if (!target) return "";
+        return `Replying to ${guestHandleFromPubkey(target.event.pubkey)}`;
+      }
+
+      function setReplyTargetById(id) {
+        const msg = messagesById.get(id);
+        if (!msg) return;
+        replyTarget = msg;
+        renderThreadReplyHint();
+      }
+
+      function isMessageInsideThread(messageId, rootId) {
+        let node = messagesById.get(messageId);
+        const seen = new Set();
+        while (node && !seen.has(node.id)) {
+          if (node.id === rootId) return true;
+          seen.add(node.id);
+          if (!node.parentId) return false;
+          node = messagesById.get(node.parentId);
+        }
+        return false;
+      }
+
+      function renderThreadReplyHint() {
+        if (!openThreadRootId || !messagesById.has(openThreadRootId)) {
+          threadReplyHint.textContent = "Open a thread to reply.";
+          return;
+        }
+
+        if (!replyTarget || !isMessageInsideThread(replyTarget.id, openThreadRootId)) {
+          replyTarget = messagesById.get(openThreadRootId);
+        }
+
+        threadReplyHint.textContent = `${replyLabel(replyTarget)} - click any message in this thread to switch reply target`;
+      }
+
+      function sortedMessages() {
+        return Array.from(messagesById.values()).sort((a, b) => a.event.created_at - b.event.created_at);
+      }
+
+      function pruneMessageCache() {
+        if (messagesById.size <= MAX_MESSAGES_IN_MEMORY) return;
+        const keep = new Set(
+          Array.from(messagesById.values())
+            .sort((a, b) => b.event.created_at - a.event.created_at)
+            .slice(0, MAX_MESSAGES_IN_MEMORY)
+            .map((msg) => msg.id),
+        );
+
+        for (const id of messagesById.keys()) {
+          if (!keep.has(id)) {
+            messagesById.delete(id);
+          }
+        }
+      }
+
+      function formatTime(unixSeconds) {
+        return new Date(unixSeconds * 1000).toLocaleTimeString();
+      }
+
+      function formatTopicTime(unixSeconds) {
+        if (!unixSeconds) return "just now";
+        const date = new Date(unixSeconds * 1000);
+        const now = new Date();
+        const sameDay = date.toDateString() === now.toDateString();
+        if (sameDay) return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        return date.toLocaleDateString([], { month: "short", day: "numeric" });
+      }
+
+      function escapeHtml(input) {
+        return input
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+      }
+
+      function renderMessages() {
+        messagesEl.innerHTML = "";
+
+        if (!currentChannelId) {
+          messagesEl.innerHTML = '<div class="notice">Start or join a room to begin chatting.</div>';
+          return;
+        }
+
+        const all = sortedMessages();
+        const topLevelMessages = all.filter((message) => !message.parentId);
+        if (!topLevelMessages.length) {
+          messagesEl.innerHTML = '<div class="notice">No takes yet. Start the conversation.</div>';
+          return;
+        }
+
+        const childrenMap = collectChildrenMap();
+        const visibleTopLevel = topLevelMessages.slice(-MAX_TOP_LEVEL_RENDER);
+
+        for (const message of visibleTopLevel) {
+          const div = document.createElement("div");
+          div.className = "message";
+
+          const totalReplies = countDescendants(message.id, childrenMap);
+
+          div.innerHTML = `
+            <div class="message-meta">
+              <span class="message-author-wrap">${avatarHtml(message.avatar)}<span class="message-author">${guestHandleFromPubkey(message.event.pubkey)}</span></span>
+              <span class="message-time">${formatTime(message.event.created_at)}</span>
+              <button type="button" class="message-count" data-open-thread title="Open thread">${totalReplies} replies</button>
+            </div>
+            <div class="message-content">${escapeHtml(message.cleanContent)}</div>
+          `;
+
+          div.querySelector("[data-open-thread]").addEventListener("click", () => {
+            openThreadRootId = message.id;
+            renderThread();
+            setReplyTargetById(message.id);
+            threadMessageInput.focus();
+          });
+
+          messagesEl.append(div);
+        }
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+
+      function collectChildrenMap() {
+        const byParent = new Map();
+        for (const msg of messagesById.values()) {
+          const key = msg.parentId || "__root__";
+          if (!byParent.has(key)) byParent.set(key, []);
+          byParent.get(key).push(msg);
+        }
+        for (const items of byParent.values()) {
+          items.sort((a, b) => a.event.created_at - b.event.created_at);
+        }
+        return byParent;
+      }
+
+      function countDescendants(rootId, map) {
+        let count = 0;
+        const stack = [...(map.get(rootId) || [])];
+        while (stack.length) {
+          const node = stack.pop();
+          count += 1;
+          const children = map.get(node.id) || [];
+          for (const child of children) stack.push(child);
+        }
+        return count;
+      }
+
+      function renderThread() {
+        if (!openThreadRootId || !messagesById.has(openThreadRootId)) {
+          threadOverlay.classList.remove("open");
+          threadBody.innerHTML = "";
+          threadMessageInput.value = "";
+          renderThreadReplyHint();
+          return;
+        }
+
+        threadOverlay.classList.add("open");
+        threadBody.innerHTML = "";
+        renderThreadReplyHint();
+
+        const map = collectChildrenMap();
+        const root = messagesById.get(openThreadRootId);
+        const baseDepth = root.depth;
+
+        const walk = (node, container) => {
+          const element = document.createElement("div");
+          element.className = "thread-node";
+          const localDepth = node.depth - baseDepth + 1;
+          element.innerHTML = `
+            <div class="message-meta">
+              <span class="message-author-wrap">${avatarHtml(node.avatar)}<span class="message-author">${guestHandleFromPubkey(node.event.pubkey)}</span></span>
+              <span class="message-time">${formatTime(node.event.created_at)}</span>
+            </div>
+            <div class="message-content">${escapeHtml(node.cleanContent)}</div>
+          `;
+          element.addEventListener("click", () => {
+            if (localDepth >= 4) {
+              alert("This thread is at the 4-level limit here.");
+              return;
+            }
+            setReplyTargetById(node.id);
+            threadMessageInput.focus();
+          });
+          container.append(element);
+
+          const children = map.get(node.id) || [];
+          if (children.length) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "thread-children";
+            container.append(wrapper);
+            for (const child of children) {
+              walk(child, wrapper);
+            }
+          }
+        };
+
+        walk(root, threadBody);
+      }
+
+      async function publishEvent(kind, content, tags) {
+        const unsigned = {
+          kind,
+          content,
+          tags,
+          created_at: Math.floor(Date.now() / 1000),
+          pubkey,
+        };
+        const event = finalizeEvent(unsigned, secretKey);
+        pool.publish(relays, event);
+        return event;
+      }
+
+      async function createTopic() {
+        const name = document.getElementById("newTopicName").value.trim();
+        const about = document.getElementById("newTopicAbout").value.trim();
+        const unlisted = document.getElementById("newTopicUnlisted").checked;
+        if (!name) {
+          alert("Room name is required.");
+          return;
+        }
+
+        const content = JSON.stringify({
+          name,
+          about,
+          unlisted,
+          ...(unlisted ? {} : { appKey: APP_ROOM_MARKER_FIELD }),
+        });
+        const tags = [["client", "gigachat-web"]];
+        if (!unlisted) {
+          tags.push(["t", APP_ROOM_MARKER_TAG]);
+        }
+        const event = await publishEvent(40, content, tags);
+        document.getElementById("newTopicName").value = "";
+        document.getElementById("newTopicAbout").value = "";
+        document.getElementById("newTopicUnlisted").checked = false;
+        document.getElementById("unlistedWarning").classList.add("hidden");
+        if (event?.id) {
+          selectTopic(event.id);
+        }
+      }
+
+      async function sendMessage() {
+        if (!currentChannelId) {
+          alert("Pick or join a room first.");
+          return;
+        }
+        const rawContent = messageInput.value.trim();
+        if (!rawContent) return;
+        const content = buildEncodedContent(rawContent);
+        await publishEvent(42, content, [["e", currentChannelId, "", "channel"]]);
+        messageInput.value = "";
+      }
+
+      async function sendThreadMessage() {
+        if (!currentChannelId || !openThreadRootId) return;
+        if (!messagesById.has(openThreadRootId)) return;
+        if (!replyTarget || !isMessageInsideThread(replyTarget.id, openThreadRootId)) {
+          replyTarget = messagesById.get(openThreadRootId);
+        }
+
+        const rawContent = threadMessageInput.value.trim();
+        if (!rawContent) return;
+        if (replyTarget.depth >= 4) {
+          alert("This thread is at the 4-level limit.");
+          return;
+        }
+        const content = buildEncodedContent(rawContent);
+
+        await publishEvent(42, content, [
+          ["e", currentChannelId, "", "channel"],
+          ["e", replyTarget.id, "", "reply"],
+        ]);
+        threadMessageInput.value = "";
+        renderThreadReplyHint();
+      }
+
+      function initEvents() {
+        advancedToggle.addEventListener("click", () => {
+          advancedPanel.classList.toggle("open");
+        });
+        document.addEventListener("click", (event) => {
+          const target = event.target;
+          if (!(target instanceof Node)) return;
+          if (advancedPanel.classList.contains("open")) {
+            if (!advancedPanel.contains(target) && !advancedToggle.contains(target)) {
+              advancedPanel.classList.remove("open");
+            }
+          }
+          if (avatarEditorPopover.classList.contains("open")) {
+            if (!avatarEditorPopover.contains(target) && !profileAvatarTrigger.contains(target)) {
+              avatarEditorPopover.classList.remove("open");
+            }
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            advancedPanel.classList.remove("open");
+            avatarEditorPopover.classList.remove("open");
+          }
+        });
+
+        document.getElementById("regenIdentity").addEventListener("click", () => {
+          const confirmed = confirm("Are you sure?");
+          if (!confirmed) return;
+          localStorage.removeItem(STORAGE_KEYS.nsec);
+          secretKey = null;
+          ensureIdentity();
+        });
+
+        profileAvatarTrigger.addEventListener("click", () => {
+          avatarEditorPopover.classList.toggle("open");
+        });
+
+        const onAvatarChange = () => {
+          const hex = rgbToHex(avatarRed.value, avatarGreen.value, avatarBlue.value);
+          myAvatar = normalizeAvatarConfig({
+            e: avatarEyesSelect.value,
+            m: avatarMouthSelect.value,
+            hex,
+          });
+          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
+          renderMyAvatarPreview();
+        };
+        const onAvatarHexInput = () => {
+          const parsedHex = sanitizeHexColor(avatarHexInput.value, myAvatar.hex);
+          myAvatar = normalizeAvatarConfig({
+            e: avatarEyesSelect.value,
+            m: avatarMouthSelect.value,
+            hex: parsedHex,
+          });
+          syncSlidersFromAvatar();
+          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
+          renderMyAvatarPreview();
+        };
+        avatarEyesSelect.addEventListener("change", onAvatarChange);
+        avatarMouthSelect.addEventListener("change", onAvatarChange);
+        avatarRed.addEventListener("input", onAvatarChange);
+        avatarGreen.addEventListener("input", onAvatarChange);
+        avatarBlue.addEventListener("input", onAvatarChange);
+        avatarHexInput.addEventListener("change", onAvatarHexInput);
+        avatarHexInput.addEventListener("blur", onAvatarHexInput);
+
+        roomSortModeSelect.addEventListener("change", () => {
+          roomSortMode = roomSortModeSelect.value;
+          renderTopics();
+        });
+
+        const newTopicUnlisted = document.getElementById("newTopicUnlisted");
+        const unlistedWarning = document.getElementById("unlistedWarning");
+        newTopicUnlisted.addEventListener("change", () => {
+          unlistedWarning.classList.toggle("hidden", !newTopicUnlisted.checked);
+        });
+
+        document.getElementById("saveRelays").addEventListener("click", () => {
+          const parsed = parseRelayInput(relayInput.value);
+          if (!parsed.length) {
+            alert("Add at least one valid connection URL.");
+            return;
+          }
+          relays = parsed;
+          localStorage.setItem(STORAGE_KEYS.relays, relays.join("\n"));
+          alert("Settings saved.");
+          advancedPanel.classList.remove("open");
+        });
+
+        document.getElementById("reconnect").addEventListener("click", () => {
+          connectTopics();
+          if (currentChannelId) selectTopic(currentChannelId);
+          advancedPanel.classList.remove("open");
+        });
+
+        document.getElementById("createTopic").addEventListener("click", createTopic);
+        document.getElementById("joinTopic").addEventListener("click", () => {
+          const id = document.getElementById("joinTopicId").value.trim();
+          if (!id || id.length !== 64) {
+            alert("Please paste a valid room code.");
+            return;
+          }
+
+          document.getElementById("joinTopicId").value = "";
+          selectTopic(id);
+          advancedPanel.classList.remove("open");
+        });
+
+        document.getElementById("sendMessage").addEventListener("click", sendMessage);
+        messageInput.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter") return;
+          if (event.shiftKey) return;
+          event.preventDefault();
+          sendMessage();
+        });
+        document.getElementById("sendThreadMessage").addEventListener("click", sendThreadMessage);
+        threadMessageInput.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter") return;
+          if (event.shiftKey) return;
+          event.preventDefault();
+          sendThreadMessage();
+        });
+        document.getElementById("cancelThreadReply").addEventListener("click", () => {
+          if (!openThreadRootId || !messagesById.has(openThreadRootId)) return;
+          replyTarget = messagesById.get(openThreadRootId);
+          renderThreadReplyHint();
+          threadMessageInput.focus();
+        });
+
+        document.getElementById("closeThread").addEventListener("click", () => {
+          openThreadRootId = null;
+          replyTarget = null;
+          renderThread();
+        });
+      }
+
+      function init() {
+        ensureIdentity();
+        setupAvatarBuilder();
+        restoreAvatar();
+        loadRelays();
+        initEvents();
+        connectTopics();
+        const roomFromUrl = new URL(window.location.href).searchParams.get("room");
+        if (isValidRoomId(roomFromUrl)) {
+          selectTopic(roomFromUrl);
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>
