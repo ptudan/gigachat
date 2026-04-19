@@ -3702,7 +3702,12 @@
       function applyProfanityDisplay(value) {
         const raw = String(value || "");
         if (profanityToggle === "off") return raw;
-        return basicProfanityFilter.clean(raw);
+        try {
+          return basicProfanityFilter.clean(raw);
+        } catch (error) {
+          console.warn("Profanity masking failed for message, showing raw text.", error);
+          return raw;
+        }
       }
 
       async function initOptionalModerationDependencies() {
@@ -3710,7 +3715,7 @@
           const module = await import("https://esm.sh/bad-words@3.0.4");
           const Filter = module.default;
           if (typeof Filter === "function") {
-            const filter = new Filter({ emptyList: true });
+            const filter = new Filter({ emptyList: true, splitRegex: /\s+/ });
             filter.addWords(...BASIC_ALLOWED_PROFANITY);
             basicProfanityFilter = filter;
           }
