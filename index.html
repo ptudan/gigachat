@@ -762,6 +762,18 @@
       <h4>Advanced settings</h4>
       <p class="tiny">Most users can ignore this.</p>
 
+      <h4>Profanity display</h4>
+      <div class="tiny">Messages are never blocked for profanity; this only changes what viewers see.</div>
+      <div style="display: grid; gap: 8px; margin-top: 8px">
+        <label class="tiny">
+          Profanity filter
+          <select id="profanityToggle" style="margin-top: 4px">
+            <option value="on">On (mask basic profanity)</option>
+            <option value="off">Off (show original text)</option>
+          </select>
+        </label>
+      </div>
+
       <h4>Connection settings</h4>
       <textarea id="relayInput"></textarea>
       <div style="display: flex; gap: 8px; margin-top: 8px">
@@ -3093,11 +3105,16 @@
     </script>
     <script type="module">
       import { SimplePool, finalizeEvent, generateSecretKey, getPublicKey, nip19 } from "https://esm.sh/nostr-tools@2.10.4";
+      import Filter from "https://esm.sh/bad-words@3.0.4";
+      import removeConfusables from "https://esm.sh/confusables@1.1.1";
+      import { isZalgo } from "https://esm.sh/unzalgo@3.0.0";
+      import braillePatternRegex from "https://esm.sh/unicode-13.0.0/Block/Braille_Patterns/regex.js";
 
       const STORAGE_KEYS = {
         nsec: "gigachat:nsec",
         relays: "gigachat:relays",
         avatar: "gigachat:avatar",
+        profanityToggle: "gigachat:profanityToggle",
       };
 
       const DEFAULT_RELAYS = [
@@ -3116,8 +3133,18 @@
       const AVATAR_EYE_COUNT = 9;
       const AVATAR_MOUTH_COUNT = 9;
       const AVATAR_TOKEN_RE = /^\[\[ga:e(\d+)m(\d+)h([0-9a-fA-F]{6})\]\]\s*/;
+      const MAX_URLS_PER_MESSAGE = 2;
+      const MAX_REPEAT_RUN = 11;
+      const BRAILLE_SPAM_THRESHOLD = 8;
+      const BRAILLE_SPAM_RATIO = 0.35;
+      const BASIC_ALLOWED_PROFANITY = ["ass", "asses", "asshole", "assholes", "crap", "damn", "dick", "fuck", "fucking", "fucks", "hell", "piss", "shit", "shits", "wtf"];
+      const TOXICITY_MODEL_THRESHOLD = 0.85;
+      const TOXICITY_MODEL_LABELS = ["toxicity", "insult", "threat", "obscene", "identity_attack"];
 
       const pool = new SimplePool();
+      const basicProfanityFilter = new Filter({ emptyList: true });
+      basicProfanityFilter.addWords(...BASIC_ALLOWED_PROFANITY);
+      let toxicityModelPromise = null;
       let secretKey = null;
       let pubkey = "";
       let relays = [];
@@ -3131,6 +3158,7 @@
       let roomSortMode = "newest";
       let activityRefreshTimer = null;
       let isMobileChatOpen = false;
+      let profanityToggle = "on";
 
       const topicsById = new Map();
       const messagesById = new Map();
@@ -3156,6 +3184,7 @@
       const threadEmojiPicker = document.getElementById("threadEmojiPicker");
       const advancedToggle = document.getElementById("advancedToggle");
       const advancedPanel = document.getElementById("advancedPanel");
+      const profanityToggleSelect = document.getElementById("profanityToggle");
       const shareToggle = document.getElementById("shareToggle");
       const sharePanel = document.getElementById("sharePanel");
       const shareRoomName = document.getElementById("shareRoomName");
@@ -3371,6 +3400,26 @@
         relayInput.value = relays.join("\n");
       }
 
+      function sanitizeProfanityToggle(value) {
+        return value === "off" ? "off" : "on";
+      }
+
+      function applyProfanityDisplay(value) {
+        const raw = String(value || "");
+        if (profanityToggle === "off") return raw;
+        return basicProfanityFilter.clean(raw);
+      }
+
+      function restoreProfanitySettings() {
+        const currentValue = localStorage.getItem(STORAGE_KEYS.profanityToggle);
+        profanityToggle = currentValue == null ? "on" : sanitizeProfanityToggle(currentValue);
+        profanityToggleSelect.value = profanityToggle;
+      }
+
+      function saveProfanitySettings() {
+        localStorage.setItem(STORAGE_KEYS.profanityToggle, profanityToggle);
+      }
+
       function ensureIdentity() {
         const existing = localStorage.getItem(STORAGE_KEYS.nsec);
         if (existing) {
@@ -3395,6 +3444,75 @@
           return JSON.parse(value);
         } catch {
           return null;
+        }
+      }
+
+      function normalizeForModeration(value) {
+        const raw = String(value || "");
+        const deobfuscated = removeConfusables(raw);
+        return deobfuscated
+          .toLowerCase()
+          .normalize("NFKC")
+          .replace(/[\u200B-\u200D\uFEFF]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function getModerationBlockReason(value) {
+        const normalized = normalizeForModeration(value);
+        if (!normalized) return "";
+        if (isZalgo(value)) return "word-art spam filter";
+        const brailleChars = normalized.match(braillePatternRegex) || [];
+        if (
+          brailleChars.length >= BRAILLE_SPAM_THRESHOLD ||
+          (normalized.length > 0 && brailleChars.length / normalized.length >= BRAILLE_SPAM_RATIO)
+        ) {
+          return "word-art spam filter";
+        }
+
+        const urlMatches = normalized.match(/https?:\/\/\S+/g) || [];
+        if (urlMatches.length > MAX_URLS_PER_MESSAGE) return "spam filter";
+        if (new RegExp(`(.)\\1{${MAX_REPEAT_RUN},}`).test(normalized)) return "spam filter";
+
+        const words = normalized.split(" ").filter(Boolean);
+        if (words.length >= 8) {
+          const uniqueWords = new Set(words);
+          if (uniqueWords.size <= Math.ceil(words.length / 3)) return "spam filter";
+        }
+
+        return "";
+      }
+
+      async function loadToxicityModel() {
+        if (toxicityModelPromise) return toxicityModelPromise;
+        toxicityModelPromise = (async () => {
+          const tfModule = await import("https://esm.sh/@tensorflow/tfjs@4.22.0");
+          if (typeof tfModule.ready === "function") {
+            await tfModule.ready();
+          }
+          const toxicityModule = await import("https://esm.sh/@tensorflow-models/toxicity@1.2.2");
+          const load = toxicityModule.load || toxicityModule.default?.load;
+          if (typeof load !== "function") {
+            throw new Error("Toxicity model loader unavailable.");
+          }
+          return load(TOXICITY_MODEL_THRESHOLD, TOXICITY_MODEL_LABELS);
+        })().catch((error) => {
+          toxicityModelPromise = null;
+          throw error;
+        });
+        return toxicityModelPromise;
+      }
+
+      async function shouldBlockByToxicityModel(value) {
+        const text = String(value || "").trim();
+        if (!text) return false;
+        try {
+          const model = await loadToxicityModel();
+          const predictions = await model.classify([text]);
+          return predictions.some((prediction) => prediction.results?.[0]?.match === true);
+        } catch (error) {
+          console.error("Toxicity model unavailable", error);
+          return false;
         }
       }
 
@@ -3480,8 +3598,9 @@
         if (!channelId) return;
         const current = roomStats.get(channelId) || { lastMessageAt: 0, messageCount: 0, lastMessagePreview: "" };
         const eventTime = event.created_at || 0;
+        const parsed = parseEncodedMessage(event.content, event.pubkey);
+        if (getModerationBlockReason(parsed.cleanText)) return;
         if (eventTime >= current.lastMessageAt) {
-          const parsed = parseEncodedMessage(event.content, event.pubkey);
           current.lastMessageAt = eventTime;
           current.lastMessagePreview = parsed.cleanText.trim();
         }
@@ -3568,7 +3687,8 @@
           button.type = "button";
           button.className = `topic ${channel.id === currentChannelId ? "active" : ""}`;
           const stats = roomStats.get(channel.id);
-          const preview = stats?.lastMessagePreview ? stats.lastMessagePreview : "No messages yet";
+          const previewRaw = stats?.lastMessagePreview ? stats.lastMessagePreview : "No messages yet";
+          const preview = applyProfanityDisplay(previewRaw);
           const previewText = preview.length > 40 ? `${preview.slice(0, 40)}...` : preview;
           const when = formatTopicTime(stats?.lastMessageAt || channel.created_at || 0);
           button.innerHTML = `<div class="topic-title">${escapeHtml(parseTopicName(channel))}</div><div class="topic-meta">${escapeHtml(previewText)} - ${escapeHtml(when)}</div>`;
@@ -3605,6 +3725,7 @@
       function normalizeMessage(event, channelId) {
         const parentId = getMessageParentId(event, channelId);
         const parsed = parseEncodedMessage(event.content, event.pubkey);
+        if (getModerationBlockReason(parsed.cleanText)) return false;
         const message = {
           id: event.id,
           event,
@@ -3615,6 +3736,7 @@
         };
         messagesById.set(event.id, message);
         message.depth = computeDepth(event.id);
+        return true;
       }
 
       function selectTopic(channelId) {
@@ -3642,7 +3764,7 @@
           {
             onevent: (event) => {
               if (messagesById.has(event.id)) return;
-              normalizeMessage(event, channelId);
+              if (!normalizeMessage(event, channelId)) return;
               updateRoomStatsFromMessage(event);
               pruneMessageCache();
               renderMessages();
@@ -3790,7 +3912,7 @@
               <span class="message-time">${formatTime(message.event.created_at)}</span>
               <button type="button" class="message-count" data-open-thread title="Open thread">${totalReplies} replies</button>
             </div>
-            <div class="message-content">${escapeHtml(message.cleanContent)}</div>
+            <div class="message-content">${escapeHtml(applyProfanityDisplay(message.cleanContent))}</div>
           `;
 
           div.querySelector("[data-open-thread]").addEventListener("click", () => {
@@ -3857,7 +3979,7 @@
               <span class="message-author-wrap">${avatarHtml(node.avatar)}<span class="message-author">${guestHandleFromPubkey(node.event.pubkey)}</span></span>
               <span class="message-time">${formatTime(node.event.created_at)}</span>
             </div>
-            <div class="message-content">${escapeHtml(node.cleanContent)}</div>
+            <div class="message-content">${escapeHtml(applyProfanityDisplay(node.cleanContent))}</div>
           `;
           element.addEventListener("click", () => {
             if (localDepth >= 4) {
@@ -3932,6 +4054,15 @@
         }
         const rawContent = messageInput.value.trim();
         if (!rawContent) return;
+        const blockReason = getModerationBlockReason(rawContent);
+        if (blockReason) {
+          alert(`Message blocked by ${blockReason}.`);
+          return;
+        }
+        if (await shouldBlockByToxicityModel(rawContent)) {
+          alert("Message blocked by safety filter.");
+          return;
+        }
         const content = buildEncodedContent(rawContent);
         await publishEvent(42, content, [["e", currentChannelId, "", "channel"]]);
         messageInput.value = "";
@@ -3946,6 +4077,15 @@
 
         const rawContent = threadMessageInput.value.trim();
         if (!rawContent) return;
+        const blockReason = getModerationBlockReason(rawContent);
+        if (blockReason) {
+          alert(`Message blocked by ${blockReason}.`);
+          return;
+        }
+        if (await shouldBlockByToxicityModel(rawContent)) {
+          alert("Message blocked by safety filter.");
+          return;
+        }
         if (replyTarget.depth >= 4) {
           alert("This thread is at the 4-level limit.");
           return;
@@ -4051,6 +4191,13 @@
           roomSortMode = roomSortModeSelect.value;
           renderTopics();
         });
+        profanityToggleSelect.addEventListener("change", () => {
+          profanityToggle = sanitizeProfanityToggle(profanityToggleSelect.value);
+          saveProfanitySettings();
+          renderTopics();
+          renderMessages();
+          renderThread();
+        });
 
         setupEmojiPicker(messageEmojiPicker, messageInput);
         setupEmojiPicker(threadEmojiPicker, threadMessageInput);
@@ -4151,6 +4298,7 @@
         setupAvatarBuilder();
         restoreAvatar();
         loadRelays();
+        restoreProfanitySettings();
         initEvents();
         refreshSharePanel();
         connectTopics();
