@@ -243,6 +243,28 @@
         gap: 10px;
       }
 
+      .create-room-panel summary {
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .create-room-panel summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .create-room-panel summary::after {
+        content: " +";
+        color: var(--muted);
+      }
+
+      .create-room-panel[open] summary::after {
+        content: " -";
+      }
+
+      .create-room-body {
+        margin-top: 10px;
+      }
+
       .header {
         border-bottom: 1px solid var(--border);
         padding: 12px 16px;
@@ -250,6 +272,10 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
+      }
+
+      .mobile-back {
+        display: none;
       }
 
       .relay-info {
@@ -332,6 +358,7 @@
         display: flex;
         gap: 8px;
         margin-top: 8px;
+        position: relative;
       }
 
       .tiny {
@@ -381,6 +408,43 @@
         border-top: 1px solid var(--border);
         padding: 8px;
         background: rgba(15, 23, 38, 0.92);
+      }
+
+      .emoji-toggle {
+        width: 34px;
+        padding: 0;
+      }
+
+      .emoji-picker {
+        position: absolute;
+        bottom: 42px;
+        left: 0;
+        width: 220px;
+        max-height: 180px;
+        overflow-y: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #0f1728;
+        padding: 6px;
+        display: none;
+        gap: 4px;
+        flex-wrap: wrap;
+        z-index: 20;
+      }
+
+      .emoji-picker.open {
+        display: flex;
+      }
+
+      .emoji-item {
+        width: 30px;
+        height: 30px;
+        padding: 0;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
       }
 
       #threadMessageInput {
@@ -450,6 +514,53 @@
       .advanced-panel h4 {
         margin: 4px 0 6px 0;
       }
+
+      @media (max-width: 840px) {
+        .app {
+          display: block;
+        }
+
+        aside,
+        main {
+          height: 100vh;
+        }
+
+        .app.mobile-chat-open aside {
+          display: none;
+        }
+
+        .app:not(.mobile-chat-open) main {
+          display: none;
+        }
+
+        .mobile-back {
+          display: inline-flex;
+          width: 30px;
+          height: 30px;
+          padding: 0;
+          border-radius: 999px;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        .header-left > div {
+          min-width: 0;
+        }
+
+        #topicName {
+          display: block;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
     </style>
   </head>
   <body>
@@ -475,19 +586,21 @@
           </div>
         </section>
 
-        <section class="panel">
-          <strong>Start a room</strong>
-          <input id="newTopicName" type="text" placeholder="Room name (ex: NFL Draft Live)" />
-          <textarea id="newTopicAbout" placeholder="What are people reacting to?"></textarea>
-          <div class="create-room-row">
-            <button id="createTopic" type="button">Start room</button>
-            <label class="tiny checkbox-row">
-              <span>unlisted</span>
-              <input id="newTopicUnlisted" type="checkbox" />
-            </label>
+        <details class="panel create-room-panel">
+          <summary><strong>Start a room</strong></summary>
+          <div class="create-room-body">
+            <input id="newTopicName" type="text" placeholder="Room name" />
+            <textarea id="newTopicAbout" placeholder="What are people reacting to?"></textarea>
+            <div class="create-room-row">
+              <button id="createTopic" type="button">Start room</button>
+              <label class="tiny checkbox-row">
+                <span>unlisted</span>
+                <input id="newTopicUnlisted" type="checkbox" />
+              </label>
+            </div>
+            <div id="unlistedWarning" class="tiny hidden" style="color: #ffb6b6">Unlisted is NOT private. Anyone with the room code or link can join.</div>
           </div>
-          <div id="unlistedWarning" class="tiny hidden" style="color: #ffb6b6">Unlisted is NOT private. Anyone with the room code or link can join.</div>
-        </section>
+        </details>
 
         <section class="panel room-sort">
           <strong>Sort rooms</strong>
@@ -503,9 +616,12 @@
 
       <main>
         <section class="header">
-          <div>
-            <strong id="topicName">Pick a room to jump in</strong>
-            <div class="relay-info" id="topicMeta"></div>
+          <div class="header-left">
+            <button id="mobileBack" class="mobile-back" type="button" title="Back to rooms">←</button>
+            <div>
+              <strong id="topicName">Pick a room to jump in</strong>
+              <div class="relay-info" id="topicMeta"></div>
+            </div>
           </div>
           <div class="tiny" id="status">Getting ready...</div>
         </section>
@@ -515,9 +631,11 @@
         </section>
 
         <section class="composer">
-          <textarea id="messageInput" placeholder="Drop your take..."></textarea>
+          <textarea id="messageInput" placeholder=""></textarea>
           <div class="row">
+            <button id="messageEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji">😊</button>
             <button id="sendMessage" type="button">Send</button>
+            <div id="messageEmojiPicker" class="emoji-picker"></div>
           </div>
         </section>
 
@@ -531,8 +649,10 @@
             <div id="threadReplyHint" class="tiny"></div>
             <textarea id="threadMessageInput" placeholder="Reply in thread..."></textarea>
             <div class="row">
+              <button id="threadEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji">😊</button>
               <button id="sendThreadMessage" type="button">Send</button>
               <button id="cancelThreadReply" type="button">Reply to top</button>
+              <div id="threadEmojiPicker" class="emoji-picker"></div>
             </div>
           </div>
         </section>
@@ -594,6 +714,7 @@
       let myAvatar = { e: 0, m: 0, hex: "ffd166" };
       let roomSortMode = "newest";
       let activityRefreshTimer = null;
+      let isMobileChatOpen = false;
 
       const topicsById = new Map();
       const messagesById = new Map();
@@ -605,6 +726,7 @@
       const roomSortModeSelect = document.getElementById("roomSortMode");
       const topicName = document.getElementById("topicName");
       const topicMeta = document.getElementById("topicMeta");
+      const mobileBack = document.getElementById("mobileBack");
       const status = document.getElementById("status");
       const messagesEl = document.getElementById("messages");
       const messageInput = document.getElementById("messageInput");
@@ -612,6 +734,10 @@
       const threadBody = document.getElementById("threadBody");
       const threadReplyHint = document.getElementById("threadReplyHint");
       const threadMessageInput = document.getElementById("threadMessageInput");
+      const messageEmojiToggle = document.getElementById("messageEmojiToggle");
+      const messageEmojiPicker = document.getElementById("messageEmojiPicker");
+      const threadEmojiToggle = document.getElementById("threadEmojiToggle");
+      const threadEmojiPicker = document.getElementById("threadEmojiPicker");
       const advancedToggle = document.getElementById("advancedToggle");
       const advancedPanel = document.getElementById("advancedPanel");
       const profileAvatarTrigger = document.getElementById("profileAvatarTrigger");
@@ -623,6 +749,32 @@
       const avatarGreen = document.getElementById("avatarGreen");
       const avatarBlue = document.getElementById("avatarBlue");
       const avatarHexInput = document.getElementById("avatarHexInput");
+      const EMOJIS = [
+        "😀",
+        "😂",
+        "🤣",
+        "😍",
+        "🔥",
+        "💯",
+        "👏",
+        "🙌",
+        "🤯",
+        "😅",
+        "😎",
+        "🥳",
+        "😭",
+        "😡",
+        "🤝",
+        "👍",
+        "👀",
+        "✅",
+        "🏈",
+        "⚾",
+        "🏀",
+        "🏆",
+        "🎉",
+        "🚀",
+      ];
 
       function setStatus(text) {
         status.textContent = text;
@@ -845,6 +997,11 @@
         history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
       }
 
+      function updateMobileView() {
+        const shouldShowChat = window.innerWidth <= 840 && isMobileChatOpen;
+        document.querySelector(".app").classList.toggle("mobile-chat-open", shouldShowChat);
+      }
+
       function isAppRoom(channelEvent) {
         if (!channelEvent || channelEvent.kind !== 40) return false;
         const hasMarkerTag = channelEvent.tags.some((tag) => tag[0] === "t" && tag[1] === APP_ROOM_MARKER_TAG);
@@ -1005,6 +1162,8 @@
       function selectTopic(channelId) {
         currentChannelId = channelId;
         setActiveRoomQueryParam(channelId);
+        isMobileChatOpen = true;
+        updateMobileView();
         replyTarget = null;
         openThreadRootId = null;
         threadOverlay.classList.remove("open");
@@ -1103,6 +1262,36 @@
         const sameDay = date.toDateString() === now.toDateString();
         if (sameDay) return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
         return date.toLocaleDateString([], { month: "short", day: "numeric" });
+      }
+
+      function insertAtCursor(textarea, text) {
+        const start = textarea.selectionStart ?? textarea.value.length;
+        const end = textarea.selectionEnd ?? textarea.value.length;
+        const before = textarea.value.slice(0, start);
+        const after = textarea.value.slice(end);
+        textarea.value = `${before}${text}${after}`;
+        const nextPos = start + text.length;
+        textarea.setSelectionRange(nextPos, nextPos);
+        textarea.focus();
+      }
+
+      function closeEmojiPickers() {
+        messageEmojiPicker.classList.remove("open");
+        threadEmojiPicker.classList.remove("open");
+      }
+
+      function setupEmojiPicker(pickerEl, textareaEl) {
+        pickerEl.innerHTML = EMOJIS.map((emoji) => `<button type="button" class="emoji-item" data-emoji="${emoji}" title="${emoji}">${emoji}</button>`).join("");
+        pickerEl.addEventListener("click", (event) => {
+          const target = event.target;
+          if (!(target instanceof HTMLElement)) return;
+          const button = target.closest("[data-emoji]");
+          if (!(button instanceof HTMLElement)) return;
+          const emoji = button.dataset.emoji;
+          if (!emoji) return;
+          insertAtCursor(textareaEl, emoji);
+          closeEmojiPickers();
+        });
       }
 
       function escapeHtml(input) {
@@ -1319,6 +1508,14 @@
         document.addEventListener("click", (event) => {
           const target = event.target;
           if (!(target instanceof Node)) return;
+          if (
+            !messageEmojiPicker.contains(target) &&
+            !messageEmojiToggle.contains(target) &&
+            !threadEmojiPicker.contains(target) &&
+            !threadEmojiToggle.contains(target)
+          ) {
+            closeEmojiPickers();
+          }
           if (advancedPanel.classList.contains("open")) {
             if (!advancedPanel.contains(target) && !advancedToggle.contains(target)) {
               advancedPanel.classList.remove("open");
@@ -1334,11 +1531,12 @@
           if (event.key === "Escape") {
             advancedPanel.classList.remove("open");
             avatarEditorPopover.classList.remove("open");
+            closeEmojiPickers();
           }
         });
 
         document.getElementById("regenIdentity").addEventListener("click", () => {
-          const confirmed = confirm("Are you sure?");
+          const confirmed = confirm("Are you sure you want to regenerate your identity?");
           if (!confirmed) return;
           localStorage.removeItem(STORAGE_KEYS.nsec);
           secretKey = null;
@@ -1381,6 +1579,17 @@
         roomSortModeSelect.addEventListener("change", () => {
           roomSortMode = roomSortModeSelect.value;
           renderTopics();
+        });
+
+        setupEmojiPicker(messageEmojiPicker, messageInput);
+        setupEmojiPicker(threadEmojiPicker, threadMessageInput);
+        messageEmojiToggle.addEventListener("click", () => {
+          threadEmojiPicker.classList.remove("open");
+          messageEmojiPicker.classList.toggle("open");
+        });
+        threadEmojiToggle.addEventListener("click", () => {
+          messageEmojiPicker.classList.remove("open");
+          threadEmojiPicker.classList.toggle("open");
         });
 
         const newTopicUnlisted = document.getElementById("newTopicUnlisted");
@@ -1446,6 +1655,11 @@
           replyTarget = null;
           renderThread();
         });
+        mobileBack.addEventListener("click", () => {
+          isMobileChatOpen = false;
+          updateMobileView();
+        });
+        window.addEventListener("resize", updateMobileView);
       }
 
       function init() {
@@ -1459,6 +1673,7 @@
         if (isValidRoomId(roomFromUrl)) {
           selectTopic(roomFromUrl);
         }
+        updateMobileView();
       }
 
       init();
