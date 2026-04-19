@@ -4166,6 +4166,57 @@
         return true;
       }
 
+      function addLocalMessageEvent(event, channelId) {
+        if (messagesById.has(event.id)) return;
+        if (!normalizeMessage(event, channelId)) return;
+        updateRoomStatsFromMessage(event);
+        pruneMessageCache();
+        renderMessages();
+        renderThread();
+        renderTopics();
+      }
+
+      function removeLocalMessageEvent(messageId, channelId) {
+        if (!messagesById.has(messageId)) return;
+        const toRemove = new Set([messageId]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const msg of messagesById.values()) {
+            if (msg.parentId && toRemove.has(msg.parentId) && !toRemove.has(msg.id)) {
+              toRemove.add(msg.id);
+              changed = true;
+            }
+          }
+        }
+        for (const id of toRemove) {
+          messagesById.delete(id);
+        }
+        if (openThreadRootId && !messagesById.has(openThreadRootId)) {
+          openThreadRootId = null;
+          replyTarget = null;
+        } else if (replyTarget && !messagesById.has(replyTarget.id)) {
+          replyTarget = openThreadRootId && messagesById.has(openThreadRootId) ? messagesById.get(openThreadRootId) : null;
+        }
+        const remaining = Array.from(messagesById.values())
+          .filter((msg) => getChannelIdFromMessage(msg.event) === channelId)
+          .sort((a, b) => a.event.created_at - b.event.created_at);
+        if (remaining.length) {
+          const last = remaining[remaining.length - 1];
+          roomStats.set(channelId, {
+            lastMessageAt: last.event.created_at || 0,
+            messageCount: remaining.length,
+            lastMessagePreview: last.cleanContent.trim(),
+          });
+        } else {
+          roomStats.delete(channelId);
+        }
+        renderThreadReplyHint();
+        renderMessages();
+        renderThread();
+        renderTopics();
+      }
+
       function selectTopic(channelId) {
         currentChannelId = channelId;
         setActiveRoomQueryParam(channelId);
@@ -4190,13 +4241,7 @@
           [{ kinds: [42], "#e": [channelId], limit: MESSAGE_FETCH_LIMIT }],
           {
             onevent: (event) => {
-              if (messagesById.has(event.id)) return;
-              if (!normalizeMessage(event, channelId)) return;
-              updateRoomStatsFromMessage(event);
-              pruneMessageCache();
-              renderMessages();
-              renderThread();
-              renderTopics();
+              addLocalMessageEvent(event, channelId);
             },
           },
         );
@@ -4432,7 +4477,7 @@
         walk(root, threadBody);
       }
 
-      async function publishEvent(kind, content, tags) {
+      function buildSignedEvent(kind, content, tags) {
         const unsigned = {
           kind,
           content,
@@ -4440,8 +4485,16 @@
           created_at: Math.floor(Date.now() / 1000),
           pubkey,
         };
-        const event = finalizeEvent(unsigned, secretKey);
+        return finalizeEvent(unsigned, secretKey);
+      }
+
+      function publishSignedEvent(event) {
         pool.publish(relays, event);
+      }
+
+      async function publishEvent(kind, content, tags) {
+        const event = buildSignedEvent(kind, content, tags);
+        publishSignedEvent(event);
         return event;
       }
 
@@ -4486,13 +4539,17 @@
           alert(`Message blocked by ${blockReason}.`);
           return;
         }
-        if (await shouldBlockByToxicityModel(rawContent)) {
+        const content = buildEncodedContent(rawContent);
+        const event = buildSignedEvent(42, content, [["e", currentChannelId, "", "channel"]]);
+        addLocalMessageEvent(event, currentChannelId);
+        messageInput.value = "";
+        const blockedByModel = await shouldBlockByToxicityModel(rawContent);
+        if (blockedByModel) {
+          removeLocalMessageEvent(event.id, currentChannelId);
           alert("Message blocked by safety filter.");
           return;
         }
-        const content = buildEncodedContent(rawContent);
-        await publishEvent(42, content, [["e", currentChannelId, "", "channel"]]);
-        messageInput.value = "";
+        publishSignedEvent(event);
       }
 
       async function sendThreadMessage() {
@@ -4509,22 +4566,25 @@
           alert(`Message blocked by ${blockReason}.`);
           return;
         }
-        if (await shouldBlockByToxicityModel(rawContent)) {
-          alert("Message blocked by safety filter.");
-          return;
-        }
         if (replyTarget.depth >= 4) {
           alert("This thread is at the 4-level limit.");
           return;
         }
         const content = buildEncodedContent(rawContent);
-
-        await publishEvent(42, content, [
+        const event = buildSignedEvent(42, content, [
           ["e", currentChannelId, "", "channel"],
           ["e", replyTarget.id, "", "reply"],
         ]);
+        addLocalMessageEvent(event, currentChannelId);
         threadMessageInput.value = "";
         renderThreadReplyHint();
+        const blockedByModel = await shouldBlockByToxicityModel(rawContent);
+        if (blockedByModel) {
+          removeLocalMessageEvent(event.id, currentChannelId);
+          alert("Message blocked by safety filter.");
+          return;
+        }
+        publishSignedEvent(event);
       }
 
       function initEvents() {
