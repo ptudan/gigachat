@@ -7,9 +7,37 @@
     <style>
       :root {
         color-scheme: dark;
+        --font-main: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
         --bg: #f1ece1;
+        --bg-glow-1: #e7dfd0;
+        --bg-glow-2: #ddd3c3;
         --panel: #faf8f1;
         --panel-soft: #efe8d9;
+        --aside-bg: #ebe4d4;
+        --input-bg: #f7f2e7;
+        --input-border: #b2a899;
+        --topic-bg: #f8f4ea;
+        --topic-border: #b1a796;
+        --topic-active-bg: #f1e8d8;
+        --topic-active-border: #8a7861;
+        --button-hover-bg: #e4dccd;
+        --header-bg: #f5efe3;
+        --composer-bg: #f3ecde;
+        --thread-overlay-bg: #f8f4eb;
+        --thread-composer-bg: #f1e9db;
+        --emoji-bg: #f7f1e5;
+        --emoji-border: #b3a999;
+        --thread-node-bg: #f6f0e3;
+        --thread-node-border: #b6ad9f;
+        --thread-node-hover-bg: #eee5d6;
+        --thread-node-hover-border: #8a7861;
+        --floating-panel-bg: #f5eee2;
+        --floating-panel-border: #b2a898;
+        --qr-bg: #fff;
+        --author-color: #5d4f3d;
+        --reply-link-color: #6a5a45;
+        --reply-link-hover-color: #3f3529;
+        --message-hover-bg: rgba(151, 135, 112, 0.18);
         --border: #a89f8f;
         --text: #2f2a23;
         --muted: #72695b;
@@ -24,11 +52,11 @@
       body {
         margin: 0;
         height: 100dvh;
-        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+        font-family: var(--font-main);
         color: var(--text);
         background:
-          radial-gradient(circle at 20% 0%, #e7dfd0 0%, transparent 34%),
-          radial-gradient(circle at 80% 100%, #ddd3c3 0%, transparent 36%),
+          radial-gradient(circle at 20% 0%, var(--bg-glow-1) 0%, transparent 34%),
+          radial-gradient(circle at 80% 100%, var(--bg-glow-2) 0%, transparent 36%),
           var(--bg);
         overflow: hidden;
       }
@@ -41,7 +69,7 @@
 
       aside {
         border-right: 2px solid var(--border);
-        background: #ebe4d4;
+        background: var(--aside-bg);
         display: flex;
         flex-direction: column;
         min-height: 0;
@@ -160,7 +188,7 @@
 
       button:hover {
         border-color: var(--accent);
-        background: #e4dccd;
+        background: var(--button-hover-bg);
         transform: translate(-1px, -1px);
         box-shadow: 3px 3px 0 #cbc2b2;
       }
@@ -178,8 +206,8 @@
       input,
       textarea {
         width: 100%;
-        background: #f7f2e7;
-        border: 2px solid #b2a899;
+        background: var(--input-bg);
+        border: 2px solid var(--input-border);
         color: var(--text);
         border-radius: 6px;
         padding: 9px 10px;
@@ -214,8 +242,8 @@
       }
 
       .topic {
-        border: 2px solid #b1a796;
-        background: #f8f4ea;
+        border: 2px solid var(--topic-border);
+        background: var(--topic-bg);
         border-radius: 6px;
         padding: 10px;
         text-align: left;
@@ -223,14 +251,43 @@
       }
 
       .topic.active {
-        border-color: #8a7861;
-        background: #f1e8d8;
+        border-color: var(--topic-active-border);
+        background: var(--topic-active-bg);
         box-shadow: 0 0 0 2px rgba(138, 120, 97, 0.24), 2px 2px 0 #d2c8b8;
       }
 
       .topic-title {
         font-weight: 600;
         letter-spacing: 0.01em;
+      }
+
+      .topic-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .topic-pin {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        padding: 0;
+        line-height: 1;
+        font-size: 14px;
+        color: var(--muted);
+        transform: none;
+      }
+
+      .topic-pin:hover {
+        background: transparent;
+        color: var(--accent);
+        transform: none;
+        box-shadow: none;
+      }
+
+      .topic-pin.pinned {
+        color: var(--accent);
       }
 
       .topic-meta {
@@ -293,7 +350,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        background: #f5efe3;
+        background: var(--header-bg);
       }
 
       .mobile-back {
@@ -321,7 +378,7 @@
       }
 
       .message:hover {
-        background: rgba(151, 135, 112, 0.18);
+        background: var(--message-hover-bg);
       }
 
       .message-meta {
@@ -332,7 +389,7 @@
       }
 
       .message-author {
-        color: #5d4f3d;
+        color: var(--author-color);
         font-size: 13px;
         font-weight: 700;
       }
@@ -361,19 +418,19 @@
         padding: 0;
         margin-left: 2px;
         cursor: pointer;
-        color: #6a5a45;
+        color: var(--reply-link-color);
         font-size: 11px;
       }
 
       .message-count:hover {
-        color: #3f3529;
+        color: var(--reply-link-hover-color);
         text-decoration: underline;
       }
 
       .composer {
         border-top: 2px solid var(--border);
         padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-        background: #f3ecde;
+        background: var(--composer-bg);
         position: sticky;
         bottom: 0;
         z-index: 6;
@@ -404,7 +461,7 @@
         width: min(560px, calc(100% - 32px));
         max-height: 70vh;
         border: 2px solid var(--accent);
-        background: #f8f4eb;
+        background: var(--thread-overlay-bg);
         border-radius: 8px;
         display: none;
         flex-direction: column;
@@ -432,7 +489,7 @@
       .thread-composer {
         border-top: 2px solid var(--border);
         padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-        background: #f1e9db;
+        background: var(--thread-composer-bg);
         position: sticky;
         bottom: 0;
         z-index: 6;
@@ -450,9 +507,9 @@
         width: 220px;
         max-height: 180px;
         overflow-y: auto;
-        border: 2px solid #b3a999;
+        border: 2px solid var(--emoji-border);
         border-radius: 6px;
-        background: #f7f1e5;
+        background: var(--emoji-bg);
         padding: 6px;
         display: none;
         gap: 4px;
@@ -483,8 +540,8 @@
       }
 
       .thread-node {
-        border: 2px solid #b6ad9f;
-        background: #f6f0e3;
+        border: 2px solid var(--thread-node-border);
+        background: var(--thread-node-bg);
         border-radius: 6px;
         padding: 6px 8px;
         margin-bottom: 6px;
@@ -492,8 +549,8 @@
       }
 
       .thread-node:hover {
-        border-color: #8a7861;
-        background: #eee5d6;
+        border-color: var(--thread-node-hover-border);
+        background: var(--thread-node-hover-bg);
       }
 
       .thread-children {
@@ -535,8 +592,8 @@
         width: min(360px, calc(100vw - 24px));
         max-height: 70vh;
         overflow-y: auto;
-        border: 2px solid #b2a898;
-        background: #f5eee2;
+        border: 2px solid var(--floating-panel-border);
+        background: var(--floating-panel-bg);
         border-radius: 8px;
         padding: 10px;
         display: none;
@@ -557,8 +614,8 @@
         right: 54px;
         bottom: 50px;
         width: min(360px, calc(100vw - 24px));
-        border: 2px solid #b2a898;
-        background: #f5eee2;
+        border: 2px solid var(--floating-panel-border);
+        background: var(--floating-panel-bg);
         border-radius: 8px;
         padding: 10px;
         display: none;
@@ -580,12 +637,31 @@
         flex: 1;
       }
 
+      .key-export-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      #exportNsecValue {
+        margin-top: 8px;
+        border: 2px solid var(--input-border);
+        background: var(--input-bg);
+        border-radius: 6px;
+        padding: 8px;
+        font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.35;
+        color: var(--text);
+        word-break: break-all;
+      }
+
       #shareQr {
         margin-top: 10px;
         width: 180px;
         height: 180px;
-        border: 2px solid #b2a898;
-        background: #fff;
+        border: 2px solid var(--floating-panel-border);
+        background: var(--qr-bg);
         overflow: hidden;
       }
 
@@ -695,7 +771,7 @@
                 <input id="newTopicUnlisted" type="checkbox" />
               </label>
             </div>
-            <div id="unlistedWarning" class="tiny hidden" style="color: #ffb6b6">Unlisted is NOT private. Anyone with the room code or link can join.</div>
+            <div id="unlistedWarning" class="tiny hidden" style="color: var(--danger)">Unlisted is NOT private. Anyone with the room code or link can join.</div>
           </div>
         </details>
 
@@ -773,6 +849,25 @@
           </select>
         </label>
       </div>
+
+      <h4 style="margin-top: 12px">Theme</h4>
+      <label class="tiny">
+        Style preset
+        <select id="themePreset" style="margin-top: 4px">
+          <option value="sepia">Sepia Classic</option>
+          <option value="paper">Paper Bright</option>
+          <option value="night">Midnight Neon</option>
+          <option value="mono">Mono Terminal</option>
+        </select>
+      </label>
+
+      <h4 style="margin-top: 12px">User key backup</h4>
+      <div class="tiny">Save this key somewhere safe if you want to keep this same user identity.</div>
+      <div class="key-export-row">
+        <button id="revealNsec" type="button">Reveal key</button>
+        <button id="copyNsec" type="button">Copy key</button>
+      </div>
+      <div id="exportNsecValue" class="tiny hidden"></div>
 
       <h4>Connection settings</h4>
       <textarea id="relayInput"></textarea>
@@ -3105,16 +3200,14 @@
     </script>
     <script type="module">
       import { SimplePool, finalizeEvent, generateSecretKey, getPublicKey, nip19 } from "https://esm.sh/nostr-tools@2.10.4";
-      import Filter from "https://esm.sh/bad-words@3.0.4";
-      import removeConfusables from "https://esm.sh/confusables@1.1.1";
-      import { isZalgo } from "https://esm.sh/unzalgo@3.0.0";
-      import braillePatternRegex from "https://esm.sh/unicode-13.0.0/Block/Braille_Patterns/regex.js";
 
       const STORAGE_KEYS = {
         nsec: "gigachat:nsec",
         relays: "gigachat:relays",
         avatar: "gigachat:avatar",
         profanityToggle: "gigachat:profanityToggle",
+        themePreset: "gigachat:themePreset",
+        pinnedRooms: "gigachat:pinnedRooms",
       };
 
       const DEFAULT_RELAYS = [
@@ -3126,6 +3219,8 @@
       const HANDLE_MASCOTS = ["Falcon", "Slugger", "Rookie", "Captain", "Hustler", "Charger", "Ace", "Comet", "Baller", "MVP"];
       const APP_ROOM_MARKER_TAG = "gigachat-room-v1";
       const APP_ROOM_MARKER_FIELD = "gigachat_room_v1";
+      const AUTOPIN_QUERY_PARAM = "pin";
+      const AUTOPIN_QUERY_VALUE = "1";
       const MESSAGE_FETCH_LIMIT = 220;
       const MAX_MESSAGES_IN_MEMORY = 320;
       const MAX_TOP_LEVEL_RENDER = 140;
@@ -3140,10 +3235,166 @@
       const BASIC_ALLOWED_PROFANITY = ["ass", "asses", "asshole", "assholes", "crap", "damn", "dick", "fuck", "fucking", "fucks", "hell", "piss", "shit", "shits", "wtf"];
       const TOXICITY_MODEL_THRESHOLD = 0.85;
       const TOXICITY_MODEL_LABELS = ["toxicity", "insult", "threat", "obscene", "identity_attack"];
+      const THEME_PRESETS = {
+        sepia: {
+          font: '"Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif',
+          bg: "#f1ece1",
+          bgGlow1: "#e7dfd0",
+          bgGlow2: "#ddd3c3",
+          panel: "#faf8f1",
+          panelSoft: "#efe8d9",
+          asideBg: "#ebe4d4",
+          inputBg: "#f7f2e7",
+          inputBorder: "#b2a899",
+          topicBg: "#f8f4ea",
+          topicBorder: "#b1a796",
+          topicActiveBg: "#f1e8d8",
+          topicActiveBorder: "#8a7861",
+          buttonHoverBg: "#e4dccd",
+          headerBg: "#f5efe3",
+          composerBg: "#f3ecde",
+          threadOverlayBg: "#f8f4eb",
+          threadComposerBg: "#f1e9db",
+          emojiBg: "#f7f1e5",
+          emojiBorder: "#b3a999",
+          threadNodeBg: "#f6f0e3",
+          threadNodeBorder: "#b6ad9f",
+          threadNodeHoverBg: "#eee5d6",
+          threadNodeHoverBorder: "#8a7861",
+          floatingPanelBg: "#f5eee2",
+          floatingPanelBorder: "#b2a898",
+          qrBg: "#ffffff",
+          authorColor: "#5d4f3d",
+          replyLinkColor: "#6a5a45",
+          replyLinkHoverColor: "#3f3529",
+          messageHoverBg: "rgba(151, 135, 112, 0.18)",
+          border: "#a89f8f",
+          text: "#2f2a23",
+          muted: "#72695b",
+          accent: "#7a6851",
+          danger: "#a34a40",
+        },
+        paper: {
+          font: '"Source Serif 4", "Times New Roman", Times, serif',
+          bg: "#f7f7f4",
+          bgGlow1: "#ffffff",
+          bgGlow2: "#e8e8de",
+          panel: "#ffffff",
+          panelSoft: "#ecece6",
+          asideBg: "#efefe8",
+          inputBg: "#ffffff",
+          inputBorder: "#b9b9aa",
+          topicBg: "#ffffff",
+          topicBorder: "#b4b4a7",
+          topicActiveBg: "#f0f0e8",
+          topicActiveBorder: "#8b8b7e",
+          buttonHoverBg: "#e4e4da",
+          headerBg: "#f3f3ec",
+          composerBg: "#efefe7",
+          threadOverlayBg: "#f8f8f2",
+          threadComposerBg: "#ecece4",
+          emojiBg: "#fbfbf7",
+          emojiBorder: "#bdbdb0",
+          threadNodeBg: "#f5f5ee",
+          threadNodeBorder: "#b9b9ac",
+          threadNodeHoverBg: "#ecece2",
+          threadNodeHoverBorder: "#8b8b7e",
+          floatingPanelBg: "#f5f5ef",
+          floatingPanelBorder: "#bdbdb0",
+          qrBg: "#ffffff",
+          authorColor: "#4b5159",
+          replyLinkColor: "#5a616b",
+          replyLinkHoverColor: "#3f464f",
+          messageHoverBg: "rgba(118, 118, 98, 0.16)",
+          border: "#a8a899",
+          text: "#262623",
+          muted: "#68685f",
+          accent: "#5b6b78",
+          danger: "#9d4242",
+        },
+        night: {
+          font: '"Avenir Next", "Segoe UI", Inter, system-ui, sans-serif',
+          bg: "#0f1217",
+          bgGlow1: "#1a1f2b",
+          bgGlow2: "#101820",
+          panel: "#161b22",
+          panelSoft: "#202734",
+          asideBg: "#131923",
+          inputBg: "#1d2430",
+          inputBorder: "#334257",
+          topicBg: "#1b2230",
+          topicBorder: "#354258",
+          topicActiveBg: "#21314b",
+          topicActiveBorder: "#63b3ed",
+          buttonHoverBg: "#263449",
+          headerBg: "#171f2b",
+          composerBg: "#141b27",
+          threadOverlayBg: "#172030",
+          threadComposerBg: "#111927",
+          emojiBg: "#1d2736",
+          emojiBorder: "#3a4b63",
+          threadNodeBg: "#1b2637",
+          threadNodeBorder: "#3d506b",
+          threadNodeHoverBg: "#223149",
+          threadNodeHoverBorder: "#63b3ed",
+          floatingPanelBg: "#192233",
+          floatingPanelBorder: "#3a4b63",
+          qrBg: "#f8fbff",
+          authorColor: "#9dd6ff",
+          replyLinkColor: "#a8c7e8",
+          replyLinkHoverColor: "#d2e8ff",
+          messageHoverBg: "rgba(99, 179, 237, 0.17)",
+          border: "#3a475c",
+          text: "#dce6f2",
+          muted: "#97a9bf",
+          accent: "#63b3ed",
+          danger: "#ff7a8a",
+        },
+        mono: {
+          font: '"IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace',
+          bg: "#101010",
+          bgGlow1: "#1a1a1a",
+          bgGlow2: "#080808",
+          panel: "#161616",
+          panelSoft: "#202020",
+          asideBg: "#141414",
+          inputBg: "#1c1c1c",
+          inputBorder: "#4a4a4a",
+          topicBg: "#191919",
+          topicBorder: "#484848",
+          topicActiveBg: "#222222",
+          topicActiveBorder: "#86efac",
+          buttonHoverBg: "#292929",
+          headerBg: "#191919",
+          composerBg: "#161616",
+          threadOverlayBg: "#1a1a1a",
+          threadComposerBg: "#141414",
+          emojiBg: "#1e1e1e",
+          emojiBorder: "#525252",
+          threadNodeBg: "#1c1c1c",
+          threadNodeBorder: "#5a5a5a",
+          threadNodeHoverBg: "#232323",
+          threadNodeHoverBorder: "#86efac",
+          floatingPanelBg: "#1a1a1a",
+          floatingPanelBorder: "#525252",
+          qrBg: "#fbfbfb",
+          authorColor: "#a7f3d0",
+          replyLinkColor: "#a3a3a3",
+          replyLinkHoverColor: "#e5e5e5",
+          messageHoverBg: "rgba(134, 239, 172, 0.16)",
+          border: "#4a4a4a",
+          text: "#ececec",
+          muted: "#b0b0b0",
+          accent: "#86efac",
+          danger: "#fb7185",
+        },
+      };
 
       const pool = new SimplePool();
-      const basicProfanityFilter = new Filter({ emptyList: true });
-      basicProfanityFilter.addWords(...BASIC_ALLOWED_PROFANITY);
+      let basicProfanityFilter = { clean: (value) => String(value || "") };
+      let removeConfusablesFn = (value) => String(value || "");
+      let isZalgoFn = () => false;
+      let braillePatternRegex = /[\u2800-\u28FF]/g;
       let toxicityModelPromise = null;
       let secretKey = null;
       let pubkey = "";
@@ -3159,6 +3410,8 @@
       let activityRefreshTimer = null;
       let isMobileChatOpen = false;
       let profanityToggle = "on";
+      let themePreset = "sepia";
+      let pinnedRoomOrder = [];
 
       const topicsById = new Map();
       const messagesById = new Map();
@@ -3185,6 +3438,10 @@
       const advancedToggle = document.getElementById("advancedToggle");
       const advancedPanel = document.getElementById("advancedPanel");
       const profanityToggleSelect = document.getElementById("profanityToggle");
+      const themePresetSelect = document.getElementById("themePreset");
+      const revealNsecButton = document.getElementById("revealNsec");
+      const copyNsecButton = document.getElementById("copyNsec");
+      const exportNsecValue = document.getElementById("exportNsecValue");
       const shareToggle = document.getElementById("shareToggle");
       const sharePanel = document.getElementById("sharePanel");
       const shareRoomName = document.getElementById("shareRoomName");
@@ -3400,6 +3657,44 @@
         relayInput.value = relays.join("\n");
       }
 
+      function savePinnedRooms() {
+        localStorage.setItem(STORAGE_KEYS.pinnedRooms, JSON.stringify(pinnedRoomOrder));
+      }
+
+      function currentNsec() {
+        return localStorage.getItem(STORAGE_KEYS.nsec) || "";
+      }
+
+      function restorePinnedRooms() {
+        const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.pinnedRooms) || "[]");
+        if (!Array.isArray(saved)) {
+          pinnedRoomOrder = [];
+          return;
+        }
+        pinnedRoomOrder = saved.filter((id, index) => isValidRoomId(id) && saved.indexOf(id) === index);
+      }
+
+      function isPinnedRoom(roomId) {
+        return pinnedRoomOrder.includes(roomId);
+      }
+
+      function togglePinnedRoom(roomId) {
+        if (!isValidRoomId(roomId)) return;
+        if (isPinnedRoom(roomId)) {
+          pinnedRoomOrder = pinnedRoomOrder.filter((id) => id !== roomId);
+        } else {
+          pinnedRoomOrder = [roomId, ...pinnedRoomOrder];
+        }
+        savePinnedRooms();
+        renderTopics();
+      }
+
+      function ensureRoomPinned(roomId) {
+        if (!isValidRoomId(roomId) || isPinnedRoom(roomId)) return;
+        pinnedRoomOrder = [roomId, ...pinnedRoomOrder];
+        savePinnedRooms();
+      }
+
       function sanitizeProfanityToggle(value) {
         return value === "off" ? "off" : "on";
       }
@@ -3410,6 +3705,55 @@
         return basicProfanityFilter.clean(raw);
       }
 
+      async function initOptionalModerationDependencies() {
+        try {
+          const module = await import("https://esm.sh/bad-words@3.0.4");
+          const Filter = module.default;
+          if (typeof Filter === "function") {
+            const filter = new Filter({ emptyList: true });
+            filter.addWords(...BASIC_ALLOWED_PROFANITY);
+            basicProfanityFilter = filter;
+          }
+        } catch (error) {
+          console.warn("bad-words import failed; profanity masking disabled fallback active.", error);
+        }
+
+        try {
+          const module = await import("https://esm.sh/confusables@1.1.1");
+          const remove = module.default;
+          if (typeof remove === "function") {
+            removeConfusablesFn = remove;
+          }
+        } catch (error) {
+          console.warn("confusables import failed; using raw text normalization.", error);
+        }
+
+        try {
+          const module = await import("https://esm.sh/unzalgo@3.0.0");
+          const isZalgo = module.isZalgo || module.default?.isZalgo;
+          if (typeof isZalgo === "function") {
+            isZalgoFn = isZalgo;
+          }
+        } catch (error) {
+          console.warn("unzalgo import failed; zalgo detection disabled.", error);
+        }
+
+        try {
+          const module = await import("https://esm.sh/unicode-13.0.0/Block/Braille_Patterns/regex.js");
+          const regex = module.default;
+          if (regex instanceof RegExp) {
+            const flags = regex.flags.includes("g") ? regex.flags : `${regex.flags}g`;
+            braillePatternRegex = new RegExp(regex.source, flags);
+          }
+        } catch (error) {
+          console.warn("braille regex import failed; using built-in braille range fallback.", error);
+        }
+
+        renderTopics();
+        renderMessages();
+        renderThread();
+      }
+
       function restoreProfanitySettings() {
         const currentValue = localStorage.getItem(STORAGE_KEYS.profanityToggle);
         profanityToggle = currentValue == null ? "on" : sanitizeProfanityToggle(currentValue);
@@ -3418,6 +3762,57 @@
 
       function saveProfanitySettings() {
         localStorage.setItem(STORAGE_KEYS.profanityToggle, profanityToggle);
+      }
+
+      function sanitizeThemePreset(value) {
+        return Object.hasOwn(THEME_PRESETS, value) ? value : "sepia";
+      }
+
+      function applyThemePreset(presetName) {
+        const preset = THEME_PRESETS[sanitizeThemePreset(presetName)];
+        const root = document.documentElement.style;
+        root.setProperty("--font-main", preset.font);
+        root.setProperty("--bg", preset.bg);
+        root.setProperty("--bg-glow-1", preset.bgGlow1);
+        root.setProperty("--bg-glow-2", preset.bgGlow2);
+        root.setProperty("--panel", preset.panel);
+        root.setProperty("--panel-soft", preset.panelSoft);
+        root.setProperty("--aside-bg", preset.asideBg);
+        root.setProperty("--input-bg", preset.inputBg);
+        root.setProperty("--input-border", preset.inputBorder);
+        root.setProperty("--topic-bg", preset.topicBg);
+        root.setProperty("--topic-border", preset.topicBorder);
+        root.setProperty("--topic-active-bg", preset.topicActiveBg);
+        root.setProperty("--topic-active-border", preset.topicActiveBorder);
+        root.setProperty("--button-hover-bg", preset.buttonHoverBg);
+        root.setProperty("--header-bg", preset.headerBg);
+        root.setProperty("--composer-bg", preset.composerBg);
+        root.setProperty("--thread-overlay-bg", preset.threadOverlayBg);
+        root.setProperty("--thread-composer-bg", preset.threadComposerBg);
+        root.setProperty("--emoji-bg", preset.emojiBg);
+        root.setProperty("--emoji-border", preset.emojiBorder);
+        root.setProperty("--thread-node-bg", preset.threadNodeBg);
+        root.setProperty("--thread-node-border", preset.threadNodeBorder);
+        root.setProperty("--thread-node-hover-bg", preset.threadNodeHoverBg);
+        root.setProperty("--thread-node-hover-border", preset.threadNodeHoverBorder);
+        root.setProperty("--floating-panel-bg", preset.floatingPanelBg);
+        root.setProperty("--floating-panel-border", preset.floatingPanelBorder);
+        root.setProperty("--qr-bg", preset.qrBg);
+        root.setProperty("--author-color", preset.authorColor);
+        root.setProperty("--reply-link-color", preset.replyLinkColor);
+        root.setProperty("--reply-link-hover-color", preset.replyLinkHoverColor);
+        root.setProperty("--message-hover-bg", preset.messageHoverBg);
+        root.setProperty("--border", preset.border);
+        root.setProperty("--text", preset.text);
+        root.setProperty("--muted", preset.muted);
+        root.setProperty("--accent", preset.accent);
+        root.setProperty("--danger", preset.danger);
+      }
+
+      function restoreThemePreset() {
+        themePreset = sanitizeThemePreset(localStorage.getItem(STORAGE_KEYS.themePreset));
+        themePresetSelect.value = themePreset;
+        applyThemePreset(themePreset);
       }
 
       function ensureIdentity() {
@@ -3449,7 +3844,7 @@
 
       function normalizeForModeration(value) {
         const raw = String(value || "");
-        const deobfuscated = removeConfusables(raw);
+        const deobfuscated = removeConfusablesFn(raw);
         return deobfuscated
           .toLowerCase()
           .normalize("NFKC")
@@ -3461,7 +3856,7 @@
       function getModerationBlockReason(value) {
         const normalized = normalizeForModeration(value);
         if (!normalized) return "";
-        if (isZalgo(value)) return "word-art spam filter";
+        if (isZalgoFn(value)) return "word-art spam filter";
         const brailleChars = normalized.match(braillePatternRegex) || [];
         if (
           brailleChars.length >= BRAILLE_SPAM_THRESHOLD ||
@@ -3542,8 +3937,18 @@
         const url = new URL(PUBLIC_SHARE_BASE_URL);
         if (roomId && isValidRoomId(roomId)) {
           url.searchParams.set("room", roomId);
+          url.searchParams.set(AUTOPIN_QUERY_PARAM, AUTOPIN_QUERY_VALUE);
         }
         return url.toString();
+      }
+
+      function consumeAutoPinQueryParam(currentUrl) {
+        if (!(currentUrl instanceof URL)) return false;
+        const shouldAutoPin = currentUrl.searchParams.get(AUTOPIN_QUERY_PARAM) === AUTOPIN_QUERY_VALUE;
+        if (!shouldAutoPin) return false;
+        currentUrl.searchParams.delete(AUTOPIN_QUERY_PARAM);
+        history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+        return true;
       }
 
       async function drawQrCode(text) {
@@ -3553,7 +3958,7 @@
           const qr = QRCode.create(text, { errorCorrectionLevel: "M" });
           shareQr.innerHTML = qr.createSvgTag(4, 0);
         } catch {
-          shareQr.innerHTML = '<div style="font: 12px serif; color: #1f1b16; padding: 78px 0; text-align: center;">QR unavailable</div>';
+          shareQr.innerHTML = '<div style="font: 12px serif; color: var(--text); padding: 78px 0; text-align: center;">QR unavailable</div>';
         }
       }
 
@@ -3625,7 +4030,7 @@
           {
             onevent: (event) => {
               updateRoomStatsFromMessage(event);
-              if (roomSortMode !== "newest") renderTopics();
+              renderTopics();
             },
           },
         );
@@ -3674,6 +4079,13 @@
           }
           return (b.created_at || 0) - (a.created_at || 0);
         });
+        const pinnedIds = pinnedRoomOrder.filter((id) => topicsById.has(id));
+        const pinnedSet = new Set(pinnedIds);
+        const eventById = new Map(events.map((event) => [event.id, event]));
+        const ordered = [
+          ...pinnedIds.map((id) => eventById.get(id)).filter(Boolean),
+          ...events.filter((event) => !pinnedSet.has(event.id)),
+        ];
         if (!events.length) {
           const note = document.createElement("div");
           note.className = "notice";
@@ -3682,7 +4094,7 @@
           return;
         }
 
-        for (const channel of events) {
+        for (const channel of ordered) {
           const button = document.createElement("button");
           button.type = "button";
           button.className = `topic ${channel.id === currentChannelId ? "active" : ""}`;
@@ -3691,7 +4103,17 @@
           const preview = applyProfanityDisplay(previewRaw);
           const previewText = preview.length > 40 ? `${preview.slice(0, 40)}...` : preview;
           const when = formatTopicTime(stats?.lastMessageAt || channel.created_at || 0);
-          button.innerHTML = `<div class="topic-title">${escapeHtml(parseTopicName(channel))}</div><div class="topic-meta">${escapeHtml(previewText)} - ${escapeHtml(when)}</div>`;
+          const pinLabel = isPinnedRoom(channel.id) ? "Unpin room" : "Pin room";
+          const pinIcon = isPinnedRoom(channel.id) ? "★" : "☆";
+          button.innerHTML = `<div class="topic-head"><div class="topic-title">${escapeHtml(parseTopicName(channel))}</div><button type="button" class="topic-pin ${isPinnedRoom(channel.id) ? "pinned" : ""}" data-pin-room title="${pinLabel}" aria-label="${pinLabel}">${pinIcon}</button></div><div class="topic-meta">${escapeHtml(previewText)} - ${escapeHtml(when)}</div>`;
+          const pinButton = button.querySelector("[data-pin-room]");
+          if (pinButton) {
+            pinButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              togglePinnedRoom(channel.id);
+            });
+          }
           button.addEventListener("click", () => selectTopic(channel.id));
           topicsEl.append(button);
         }
@@ -3769,7 +4191,7 @@
               pruneMessageCache();
               renderMessages();
               renderThread();
-              if (roomSortMode !== "newest") renderTopics();
+              renderTopics();
             },
           },
         );
@@ -4198,6 +4620,11 @@
           renderMessages();
           renderThread();
         });
+        themePresetSelect.addEventListener("change", () => {
+          themePreset = sanitizeThemePreset(themePresetSelect.value);
+          localStorage.setItem(STORAGE_KEYS.themePreset, themePreset);
+          applyThemePreset(themePreset);
+        });
 
         setupEmojiPicker(messageEmojiPicker, messageInput);
         setupEmojiPicker(threadEmojiPicker, threadMessageInput);
@@ -4226,6 +4653,40 @@
           localStorage.setItem(STORAGE_KEYS.relays, relays.join("\n"));
           alert("Settings saved.");
           advancedPanel.classList.remove("open");
+        });
+        revealNsecButton.addEventListener("click", () => {
+          const nsec = currentNsec();
+          if (!nsec) {
+            alert("No key found for this user.");
+            return;
+          }
+          exportNsecValue.textContent = nsec;
+          exportNsecValue.classList.remove("hidden");
+        });
+        copyNsecButton.addEventListener("click", async () => {
+          const nsec = currentNsec();
+          if (!nsec) {
+            alert("No key found for this user.");
+            return;
+          }
+          try {
+            await navigator.clipboard.writeText(nsec);
+            copyNsecButton.textContent = "Copied";
+            setTimeout(() => {
+              copyNsecButton.textContent = "Copy key";
+            }, 1200);
+          } catch {
+            exportNsecValue.textContent = nsec;
+            exportNsecValue.classList.remove("hidden");
+            const selection = window.getSelection();
+            if (selection) {
+              const range = document.createRange();
+              range.selectNodeContents(exportNsecValue);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+            document.execCommand("copy");
+          }
         });
         copyShareLink.addEventListener("click", async () => {
           if (!shareLinkInput.value) return;
@@ -4298,12 +4759,18 @@
         setupAvatarBuilder();
         restoreAvatar();
         loadRelays();
+        initOptionalModerationDependencies();
+        restorePinnedRooms();
         restoreProfanitySettings();
+        restoreThemePreset();
         initEvents();
         refreshSharePanel();
         connectTopics();
-        const roomFromUrl = new URL(window.location.href).searchParams.get("room");
+        const launchUrl = new URL(window.location.href);
+        const shouldAutoPin = consumeAutoPinQueryParam(launchUrl);
+        const roomFromUrl = launchUrl.searchParams.get("room");
         if (isValidRoomId(roomFromUrl)) {
+          if (shouldAutoPin) ensureRoomPinned(roomFromUrl);
           selectTopic(roomFromUrl);
         }
         updateMobileView();
