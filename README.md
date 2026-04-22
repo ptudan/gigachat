@@ -2,6 +2,8 @@
 
 `gigachat` is a no-backend, static HTML app for Nostr channel chat.
 
+Now deployed at: https://din.fm
+
 pages: https://ptudan.github.io/gigachat/
 
 - Uses NIP-28 style channel events:

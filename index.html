@@ -3876,6 +3876,9 @@
       const AVATAR_MOUTH_COUNT = 9;
       const ROOM_STATS_WINDOW_SEC = 900;
       const ROOM_STATS_OLDEST_SLICE = 24;
+      const SIDEBAR_REFRESH_INTERVAL_MS = 45000;
+      const SIDEBAR_REFRESH_ROOMS_LIMIT = 60;
+      const SIDEBAR_ACTIVITY_FETCH_LIMIT = 300;
       const LEGACY_AVATAR_TOKEN_RE = /^\[\[ga:e(\d+)m(\d+)h([0-9a-fA-F]{6})\]\]\s*/;
       const MAX_URLS_PER_MESSAGE = 2;
       const MAX_REPEAT_RUN = 11;
@@ -4057,9 +4060,9 @@
       let pubkey = "";
       let relays = [];
       let topicSub = null;
-      let roomActivitySub = null;
       let messageSub = null;
       let avatarSub = null;
+      let sidebarRefreshTimer = null;
       let currentChannelId = "";
       let replyTarget = null;
       let openThreadRootId = null;
@@ -4378,7 +4381,7 @@
         });
         announcedRoomListings.add(roomId);
         renderTopics();
-        scheduleActivityFeedRefresh();
+        scheduleSidebarRefresh();
         resolvePendingRoomAliasQuery();
       }
 
@@ -5064,20 +5067,41 @@
         roomStats.set(channelId, current);
       }
 
-      function scheduleActivityFeedRefresh() {
+      function scheduleSidebarRefresh() {
         if (activityRefreshTimer) clearTimeout(activityRefreshTimer);
         activityRefreshTimer = setTimeout(() => {
-          connectRoomActivityFeed();
+          refreshSidebarActivityFeed();
         }, 250);
       }
 
-      function connectRoomActivityFeed() {
-        if (roomActivitySub) roomActivitySub.close();
-        const roomIds = Array.from(topicsById.keys());
+      function sidebarTrackedRoomIds() {
+        const events = Array.from(topicsById.values()).sort((a, b) => {
+          const aScore = roomStats.get(a.id)?.lastMessageAt || a.created_at || 0;
+          const bScore = roomStats.get(b.id)?.lastMessageAt || b.created_at || 0;
+          return bScore - aScore;
+        });
+        const pinned = pinnedRoomOrder.filter((id) => topicsById.has(id));
+        const pinnedSet = new Set(pinned);
+        const top = events.filter((event) => !pinnedSet.has(event.id)).slice(0, SIDEBAR_REFRESH_ROOMS_LIMIT).map((event) => event.id);
+        const unique = [];
+        const seen = new Set();
+        for (const id of [...pinned, ...top]) {
+          if (!isValidRoomId(id) || seen.has(id)) continue;
+          seen.add(id);
+          unique.push(id);
+        }
+        return unique;
+      }
+
+      function refreshSidebarActivityFeed() {
+        const roomIds = sidebarTrackedRoomIds();
         if (!roomIds.length) return;
-        roomActivitySub = pool.subscribeMany(
+        const sub = pool.subscribeMany(
           relays,
-          [{ kinds: [42], "#e": roomIds, limit: 1200 }, { kinds: [GIGACHAT_ROOM_STATS_KIND], "#e": roomIds, limit: 1000 }],
+          [
+            { kinds: [42], "#e": roomIds, limit: SIDEBAR_ACTIVITY_FETCH_LIMIT },
+            { kinds: [GIGACHAT_ROOM_STATS_KIND], "#e": roomIds, limit: SIDEBAR_ACTIVITY_FETCH_LIMIT },
+          ],
           {
             onevent: (event) => {
               if (event.kind === GIGACHAT_ROOM_STATS_KIND) {
@@ -5085,10 +5109,21 @@
                 return;
               }
               updateRoomStatsFromMessage(event);
+            },
+            oneose: () => {
               renderTopics();
+              sub.close();
             },
           },
         );
+      }
+
+      function startSidebarRefreshLoop() {
+        if (sidebarRefreshTimer) clearInterval(sidebarRefreshTimer);
+        refreshSidebarActivityFeed();
+        sidebarRefreshTimer = setInterval(() => {
+          refreshSidebarActivityFeed();
+        }, SIDEBAR_REFRESH_INTERVAL_MS);
       }
 
       function connectAvatarFeed() {
@@ -5108,7 +5143,6 @@
 
       function connectTopics() {
         if (topicSub) topicSub.close();
-        if (roomActivitySub) roomActivitySub.close();
         setStatus("Connecting...");
         topicSub = pool.subscribeMany(
           relays,
@@ -5125,12 +5159,12 @@
               announcedRoomListings.add(event.id);
               registerRoomAlias(parseTopicName(event), event.id, event.created_at || 0);
               renderTopics();
-              scheduleActivityFeedRefresh();
+              scheduleSidebarRefresh();
               resolvePendingRoomAliasQuery();
             },
             oneose: () => {
               setStatus("Live", formatMessagesPerHourLabel(currentChannelId));
-              connectRoomActivityFeed();
+              startSidebarRefreshLoop();
               connectAvatarFeed();
               resolvePendingRoomAliasQuery();
             },
