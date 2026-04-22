@@ -3865,6 +3865,7 @@
       const APP_ROOM_MARKER_FIELD = "gigachat_room_v1";
       const GIGACHAT_AVATAR_KIND = 30078;
       const GIGACHAT_ROOM_STATS_KIND = 14578;
+      const GIGACHAT_ROOM_LISTING_KIND = 14579;
       const AUTOPIN_QUERY_PARAM = "pin";
       const AUTOPIN_QUERY_VALUE = "1";
       const MESSAGE_FETCH_LIMIT = 220;
@@ -4075,6 +4076,9 @@
       let moderationDependenciesLoaded = false;
       let filterPack = null;
       let blockedPubkeys = new Set();
+      const announcedRoomListings = new Set();
+      let pendingRoomAliasQuery = "";
+      let pendingRoomAliasAutoPin = false;
 
       const topicsById = new Map();
       const messagesById = new Map();
@@ -4082,6 +4086,7 @@
       const avatarsByPubkey = new Map();
       const avatarEventTimeByPubkey = new Map();
       const roomStatsByRoomId = new Map();
+      const roomAliasIndex = new Map();
 
       const identityCode = document.getElementById("identityCode");
       const relayInput = document.getElementById("relayInput");
@@ -4352,6 +4357,52 @@
           if (currentChannelId === parsed.roomId) {
             refreshLiveRateStatus();
           }
+        }
+      }
+
+      function applyRoomListingEvent(event) {
+        const roomId = getTag(event, "e", "channel")?.[1] || getChannelIdFromMessage(event);
+        if (!isValidRoomId(roomId)) return;
+        const parsed = safeJsonParse(event.content || "");
+        const name = typeof parsed?.name === "string" && parsed.name.trim() ? parsed.name.trim() : "Untitled din";
+        const alias = typeof parsed?.alias === "string" && parsed.alias.trim() ? parsed.alias.trim() : name;
+        registerRoomAlias(alias, roomId, event.created_at || 0);
+        if (topicsById.has(roomId)) return;
+        topicsById.set(roomId, {
+          id: roomId,
+          kind: 40,
+          created_at: event.created_at || Math.floor(Date.now() / 1000),
+          content: JSON.stringify({ name, appKey: APP_ROOM_MARKER_FIELD }),
+          tags: [["t", APP_ROOM_MARKER_TAG]],
+          pubkey: event.pubkey,
+        });
+        announcedRoomListings.add(roomId);
+        renderTopics();
+        scheduleActivityFeedRefresh();
+        resolvePendingRoomAliasQuery();
+      }
+
+      async function publishRoomListingIfMissing(roomId) {
+        if (!isValidRoomId(roomId)) return;
+        if (topicsById.has(roomId) || announcedRoomListings.has(roomId)) return;
+        const knownName = topicsById.get(roomId) ? parseTopicName(topicsById.get(roomId)) : topicName.textContent?.trim();
+        const safeName = knownName && knownName !== "Joined the din" ? knownName : "Untitled din";
+        const alias = safeName;
+        try {
+          await publishEvent(
+            GIGACHAT_ROOM_LISTING_KIND,
+            JSON.stringify({
+              roomId,
+              name: safeName,
+              alias,
+              appKey: APP_ROOM_MARKER_FIELD,
+            }),
+            [["e", roomId, "", "channel"], ["t", APP_ROOM_MARKER_TAG], ["client", "gigachat-web"]],
+          );
+          announcedRoomListings.add(roomId);
+          registerRoomAlias(alias, roomId, Math.floor(Date.now() / 1000));
+        } catch (error) {
+          console.warn("Failed to publish room listing", error);
         }
       }
 
@@ -4877,6 +4928,43 @@
         return "Untitled din";
       }
 
+      function normalizeRoomAlias(value) {
+        return String(value || "")
+          .normalize("NFKC")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      function registerRoomAlias(alias, roomId, createdAt = 0) {
+        const normalizedAlias = normalizeRoomAlias(alias);
+        if (!normalizedAlias || !isValidRoomId(roomId)) return;
+        const existing = roomAliasIndex.get(normalizedAlias);
+        if (!existing || createdAt >= existing.createdAt) {
+          roomAliasIndex.set(normalizedAlias, { roomId, createdAt });
+        }
+      }
+
+      function roomIdFromAlias(alias) {
+        const normalizedAlias = normalizeRoomAlias(alias);
+        if (!normalizedAlias) return "";
+        return roomAliasIndex.get(normalizedAlias)?.roomId || "";
+      }
+
+      function resolvePendingRoomAliasQuery() {
+        if (!pendingRoomAliasQuery) return;
+        const resolvedRoomId = roomIdFromAlias(pendingRoomAliasQuery);
+        if (!resolvedRoomId) return;
+        const shouldPin = pendingRoomAliasAutoPin;
+        pendingRoomAliasQuery = "";
+        pendingRoomAliasAutoPin = false;
+        if (shouldPin) ensureRoomPinned(resolvedRoomId);
+        if (currentChannelId !== resolvedRoomId) {
+          selectTopic(resolvedRoomId);
+        }
+      }
+
       function isValidRoomId(value) {
         return typeof value === "string" && /^[0-9a-f]{64}$/i.test(value);
       }
@@ -4884,7 +4972,9 @@
       function setActiveRoomQueryParam(roomId) {
         const url = new URL(window.location.href);
         if (roomId && isValidRoomId(roomId)) {
-          url.searchParams.set("room", roomId);
+          const topic = topicsById.get(roomId);
+          const alias = topic ? parseTopicName(topic) : "";
+          url.searchParams.set("room", alias && alias !== "Untitled din" ? alias : roomId);
         } else {
           url.searchParams.delete("room");
         }
@@ -4894,7 +4984,9 @@
       function getShareUrl(roomId = currentChannelId) {
         const url = new URL(PUBLIC_SHARE_BASE_URL);
         if (roomId && isValidRoomId(roomId)) {
-          url.searchParams.set("room", roomId);
+          const topic = topicsById.get(roomId);
+          const alias = topic ? parseTopicName(topic) : "";
+          url.searchParams.set("room", alias && alias !== "Untitled din" ? alias : roomId);
           url.searchParams.set(AUTOPIN_QUERY_PARAM, AUTOPIN_QUERY_VALUE);
         }
         return url.toString();
@@ -5020,19 +5112,27 @@
         setStatus("Connecting...");
         topicSub = pool.subscribeMany(
           relays,
-          [{ kinds: [40], limit: 200 }],
+          [{ kinds: [40, GIGACHAT_ROOM_LISTING_KIND], limit: 400 }],
           {
             onevent: (event) => {
+              if (event.kind === GIGACHAT_ROOM_LISTING_KIND) {
+                applyRoomListingEvent(event);
+                return;
+              }
               if (!isAppRoom(event)) return;
               if (topicsById.has(event.id)) return;
               topicsById.set(event.id, event);
+              announcedRoomListings.add(event.id);
+              registerRoomAlias(parseTopicName(event), event.id, event.created_at || 0);
               renderTopics();
               scheduleActivityFeedRefresh();
+              resolvePendingRoomAliasQuery();
             },
             oneose: () => {
               setStatus("Live", formatMessagesPerHourLabel(currentChannelId));
               connectRoomActivityFeed();
               connectAvatarFeed();
+              resolvePendingRoomAliasQuery();
             },
           },
         );
@@ -5574,6 +5674,7 @@
           return;
         }
         publishSignedEvent(event);
+        publishRoomListingIfMissing(currentChannelId);
         maybePublishRoomStats(currentChannelId);
       }
 
@@ -5615,6 +5716,7 @@
           return;
         }
         publishSignedEvent(event);
+        publishRoomListingIfMissing(currentChannelId);
         maybePublishRoomStats(currentChannelId);
       }
 
@@ -5967,9 +6069,20 @@
         const launchUrl = new URL(window.location.href);
         const shouldAutoPin = consumeAutoPinQueryParam(launchUrl);
         const roomFromUrl = launchUrl.searchParams.get("room");
-        if (isValidRoomId(roomFromUrl)) {
-          if (shouldAutoPin) ensureRoomPinned(roomFromUrl);
-          selectTopic(roomFromUrl);
+        if (roomFromUrl) {
+          if (isValidRoomId(roomFromUrl)) {
+            if (shouldAutoPin) ensureRoomPinned(roomFromUrl);
+            selectTopic(roomFromUrl);
+          } else {
+            const resolvedRoomId = roomIdFromAlias(roomFromUrl);
+            if (resolvedRoomId) {
+              if (shouldAutoPin) ensureRoomPinned(resolvedRoomId);
+              selectTopic(resolvedRoomId);
+            } else {
+              pendingRoomAliasQuery = roomFromUrl;
+              pendingRoomAliasAutoPin = shouldAutoPin;
+            }
+          }
         }
         updateMobileView();
       }
