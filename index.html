@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>gigachat</title>
+    <title>din.fm</title>
     <link
       rel="icon"
       type="image/svg+xml"
-      href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"%3E%3Crect width="64" height="64" rx="14" fill="%23222" /%3E%3Ccircle cx="24" cy="28" r="4" fill="%23fff" /%3E%3Ccircle cx="40" cy="28" r="4" fill="%23fff" /%3E%3Cpath d="M20 40c3 5 8 8 12 8s9-3 12-8" fill="none" stroke="%23fff" stroke-width="4" stroke-linecap="round" /%3E%3Cpath d="M14 18h14l5 5h17v20H33l-5 5V43H14z" fill="none" stroke="%2386efac" stroke-width="3" /%3E%3C/svg%3E'
+      href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none"%3E%3Crect x="1" y="1" width="94" height="94" rx="18" fill="%2312151D" stroke="%23232938" stroke-width="2"/%3E%3Cpath d="M24 65C31 57 41 53 48 53C55 53 65 57 72 65" stroke="%236D8BFF" stroke-width="6" stroke-linecap="round"/%3E%3Cpath d="M18 50C26 39 37 33 48 33C59 33 70 39 78 50" stroke="%2386EFAF" stroke-opacity=".95" stroke-width="5" stroke-linecap="round"/%3E%3Cpath d="M14 36C23 24 36 17 48 17C60 17 73 24 82 36" stroke="%239AA5C4" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/%3E%3Ccircle cx="48" cy="67" r="5.5" fill="%23E5E8EF"/%3E%3C/svg%3E'
     />
     <style>
       :root {
@@ -147,6 +147,41 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+      }
+
+      .brand-lockup {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+      }
+
+      .brand-mark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .brand-wordmark {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: lowercase;
+      }
+
+      .brand-tagline {
+        margin-top: 2px;
+        font-size: 11px;
+        color: var(--muted);
       }
 
       .profile-row {
@@ -1267,6 +1302,21 @@
     <div class="app">
       <aside>
         <section class="panel identity">
+          <div class="brand-lockup" aria-label="din.fm">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="94" height="94" rx="18" fill="#12151D" stroke="#232938" stroke-width="2" />
+                <path d="M24 65C31 57 41 53 48 53C55 53 65 57 72 65" stroke="#6D8BFF" stroke-width="6" stroke-linecap="round" />
+                <path d="M18 50C26 39 37 33 48 33C59 33 70 39 78 50" stroke="#86EFAF" stroke-opacity=".95" stroke-width="5" stroke-linecap="round" />
+                <path d="M14 36C23 24 36 17 48 17C60 17 73 24 82 36" stroke="#9AA5C4" stroke-opacity=".8" stroke-width="4" stroke-linecap="round" />
+                <circle cx="48" cy="67" r="5.5" fill="#E5E8EF" />
+              </svg>
+            </span>
+            <span>
+              <span class="brand-wordmark">din.fm</span>
+              <span class="brand-tagline">the global chat firehose</span>
+            </span>
+          </div>
           <div class="profile-row">
             <button id="profileAvatarTrigger" class="avatar-trigger" type="button" title="Edit avatar">
               <span id="profileAvatarPreview" class="avatar-face"></span>
@@ -1302,7 +1352,7 @@
           <summary><span>Start a room</span></summary>
           <div class="create-room-body">
             <input id="newTopicName" type="text" placeholder="Room name" />
-            <textarea id="newTopicAbout" placeholder="What are people reacting to?"></textarea>
+            <textarea id="newTopicAbout" placeholder="What is everyone reacting to right now?"></textarea>
             <div class="create-room-row">
               <button id="createTopic" class="primary" type="button">Start room</button>
               <label class="tiny checkbox-row">
@@ -1331,12 +1381,12 @@
           <div class="header-left">
             <button id="mobileBack" class="mobile-back" type="button" title="Back to rooms">←</button>
             <div>
-              <strong id="topicName">Pick a room to jump in</strong>
-              <div class="relay-info" id="topicMeta"></div>
+              <strong id="topicName">Step into the din</strong>
+              <div class="relay-info" id="topicMeta">Global firehose chat for live moments.</div>
             </div>
           </div>
           <div class="header-right">
-            <span class="status-pill" id="status">Getting ready...</span>
+            <span class="status-pill" id="status">Tuning in...</span>
             <button id="shareToggle" class="header-icon-btn" type="button" title="Share room" aria-label="Share room">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
@@ -1347,12 +1397,12 @@
         </section>
 
         <section id="messages">
-          <div class="notice">Start a room or join one and share your live takes.</div>
+          <div class="notice">Jump into the din - start a room or join one and add your voice.</div>
         </section>
 
         <section class="composer">
           <div class="composer-shell">
-            <textarea id="messageInput" placeholder="Message the room..."></textarea>
+            <textarea id="messageInput" placeholder="Add to the din..."></textarea>
             <div class="row">
               <button id="messageEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji" aria-label="Insert emoji">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>
@@ -3820,7 +3870,7 @@
       const MESSAGE_FETCH_LIMIT = 220;
       const MAX_MESSAGES_IN_MEMORY = 320;
       const MAX_TOP_LEVEL_RENDER = 140;
-      const PUBLIC_SHARE_BASE_URL = "https://opengroupchat.com/";
+      const PUBLIC_SHARE_BASE_URL = "https://din.fm/";
       const AVATAR_EYE_COUNT = 9;
       const AVATAR_MOUTH_COUNT = 9;
       const ROOM_STATS_WINDOW_SEC = 900;
@@ -4824,7 +4874,7 @@
         if (parsed && typeof parsed.name === "string" && parsed.name.trim()) {
           return parsed.name.trim();
         }
-        return "Untitled room";
+        return "Untitled din";
       }
 
       function isValidRoomId(value) {
@@ -5018,7 +5068,7 @@
         if (!events.length) {
           const note = document.createElement("div");
           note.className = "notice";
-          note.textContent = "No rooms yet. Be the first to start one.";
+          note.textContent = "No rooms in the din yet. Start one and light it up.";
           topicsEl.append(note);
           return;
         }
@@ -5157,8 +5207,8 @@
         renderMessages();
 
         const channel = topicsById.get(channelId);
-        topicName.textContent = channel ? parseTopicName(channel) : "Joined room";
-        topicMeta.textContent = "Live room";
+        topicName.textContent = channel ? parseTopicName(channel) : "Joined the din";
+        topicMeta.textContent = "Live global din";
         refreshLiveRateStatus();
 
         if (messageSub) messageSub.close();
@@ -5292,14 +5342,14 @@
         messagesEl.innerHTML = "";
 
         if (!currentChannelId) {
-          messagesEl.innerHTML = '<div class="notice">Start or join a room to begin chatting.</div>';
+          messagesEl.innerHTML = '<div class="notice">Start or join a room to join the din.</div>';
           return;
         }
 
         const all = sortedMessages();
         const topLevelMessages = all.filter((message) => !message.parentId);
         if (!topLevelMessages.length) {
-          messagesEl.innerHTML = '<div class="notice">No takes yet. Start the conversation.</div>';
+          messagesEl.innerHTML = '<div class="notice">Quiet for now. Be the first voice in this din.</div>';
           return;
         }
 
