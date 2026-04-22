@@ -12,68 +12,117 @@
     <style>
       :root {
         color-scheme: dark;
-        --font-main: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-        --bg: #f1ece1;
-        --bg-glow-1: #e7dfd0;
-        --bg-glow-2: #ddd3c3;
-        --panel: #faf8f1;
-        --panel-soft: #efe8d9;
-        --aside-bg: #ebe4d4;
-        --input-bg: #f7f2e7;
-        --input-border: #b2a899;
-        --topic-bg: #f8f4ea;
-        --topic-border: #b1a796;
-        --topic-active-bg: #f1e8d8;
-        --topic-active-border: #8a7861;
-        --button-hover-bg: #e4dccd;
-        --header-bg: #f5efe3;
-        --composer-bg: #f3ecde;
-        --thread-overlay-bg: #f8f4eb;
-        --thread-composer-bg: #f1e9db;
-        --emoji-bg: #f7f1e5;
-        --emoji-border: #b3a999;
-        --thread-node-bg: #f6f0e3;
-        --thread-node-border: #b6ad9f;
-        --thread-node-hover-bg: #eee5d6;
-        --thread-node-hover-border: #8a7861;
-        --floating-panel-bg: #f5eee2;
-        --floating-panel-border: #b2a898;
-        --qr-bg: #fff;
-        --author-color: #5d4f3d;
-        --reply-link-color: #6a5a45;
-        --reply-link-hover-color: #3f3529;
-        --message-hover-bg: rgba(151, 135, 112, 0.18);
-        --border: #a89f8f;
-        --text: #2f2a23;
-        --muted: #72695b;
-        --accent: #7a6851;
-        --danger: #a34a40;
+        --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Ubuntu, sans-serif;
+
+        /* Midnight palette (default) */
+        --bg: #0b0d12;
+        --bg-glow-1: #171c28;
+        --bg-glow-2: #0e1320;
+        --panel: #12151d;
+        --panel-soft: #1a1e28;
+        --aside-bg: #0f1219;
+        --input-bg: #141824;
+        --input-border: #262c3a;
+        --topic-bg: #141824;
+        --topic-border: #232938;
+        --topic-active-bg: #1b2334;
+        --topic-active-border: #6d8bff;
+        --button-hover-bg: #1f2432;
+        --header-bg: rgba(14, 17, 24, 0.72);
+        --composer-bg: rgba(14, 17, 24, 0.72);
+        --thread-overlay-bg: #141824;
+        --thread-composer-bg: rgba(16, 20, 28, 0.85);
+        --emoji-bg: #161b27;
+        --emoji-border: #262c3a;
+        --thread-node-bg: #151a26;
+        --thread-node-border: #232938;
+        --thread-node-hover-bg: #1b2130;
+        --thread-node-hover-border: #6d8bff;
+        --floating-panel-bg: rgba(18, 22, 32, 0.92);
+        --floating-panel-border: #262c3a;
+        --qr-bg: #f4f5f8;
+        --author-color: #e6ebff;
+        --reply-link-color: #9aa5c4;
+        --reply-link-hover-color: #c9d2ef;
+        --message-hover-bg: rgba(109, 139, 255, 0.06);
+        --border: #22283a;
+        --text: #e5e8ef;
+        --muted: #8691a8;
+        --accent: #6d8bff;
+        --accent-soft: rgba(109, 139, 255, 0.14);
+        --danger: #ff6b7a;
+
+        /* Shared design tokens (theme-independent) */
+        --radius-xs: 6px;
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-pill: 999px;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
+        --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.24), 0 1px 2px rgba(0, 0, 0, 0.16);
+        --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+        --ring: 0 0 0 3px var(--accent-soft);
+        --transition: 140ms cubic-bezier(0.2, 0.6, 0.2, 1);
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html,
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
       body {
         margin: 0;
         height: 100dvh;
         font-family: var(--font-main);
+        font-size: 14px;
+        line-height: 1.5;
         color: var(--text);
         background:
-          radial-gradient(circle at 20% 0%, var(--bg-glow-1) 0%, transparent 34%),
-          radial-gradient(circle at 80% 100%, var(--bg-glow-2) 0%, transparent 36%),
+          radial-gradient(ellipse 80% 60% at 15% -10%, var(--bg-glow-1) 0%, transparent 55%),
+          radial-gradient(ellipse 70% 50% at 95% 110%, var(--bg-glow-2) 0%, transparent 55%),
           var(--bg);
         overflow: hidden;
+        letter-spacing: -0.005em;
+      }
+
+      ::selection {
+        background: var(--accent-soft);
+        color: var(--text);
+      }
+
+      /* Scrollbars */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, var(--muted) 28%, transparent);
+        border-radius: var(--radius-pill);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: color-mix(in srgb, var(--muted) 50%, transparent);
+        background-clip: padding-box;
       }
 
       .app {
         display: grid;
-        grid-template-columns: 320px 1fr;
+        grid-template-columns: 300px 1fr;
         height: 100dvh;
       }
 
       aside {
-        border-right: 2px solid var(--border);
+        border-right: 1px solid var(--border);
         background: var(--aside-bg);
         display: flex;
         flex-direction: column;
@@ -91,23 +140,24 @@
 
       .panel {
         padding: 14px 16px;
-        border-bottom: 2px solid var(--border);
+        border-bottom: 1px solid var(--border);
       }
 
       .identity {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
       }
 
       .profile-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
       }
 
       .identity code {
-        font-size: 13px;
+        font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+        font-size: 12px;
         color: var(--muted);
         overflow: hidden;
         text-overflow: ellipsis;
@@ -116,13 +166,26 @@
 
       .icon-btn {
         margin-left: auto;
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         padding: 0;
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        background: transparent;
+        border: 1px solid var(--border);
+        box-shadow: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .icon-btn:hover {
+        background: var(--button-hover-bg);
+        color: var(--text);
+        border-color: color-mix(in srgb, var(--muted) 40%, var(--border));
+        transform: none;
+        box-shadow: none;
       }
 
       .avatar-preview-wrap {
@@ -138,15 +201,25 @@
         display: inline-flex;
         align-items: center;
         cursor: pointer;
+        box-shadow: none;
+        border-radius: var(--radius-pill);
+      }
+
+      .avatar-trigger:hover {
+        background: transparent;
+        transform: none;
+        box-shadow: 0 0 0 3px var(--accent-soft);
       }
 
       .avatar-face {
-        width: 26px;
-        height: 26px;
-        border-radius: 999px;
+        width: 30px;
+        height: 30px;
+        border-radius: var(--radius-pill);
         display: inline-flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
       }
 
       .avatar-face svg {
@@ -156,13 +229,13 @@
       }
 
       .avatar-editor-popover {
-        margin-top: 8px;
+        margin-top: 10px;
         border: 1px solid var(--border);
-        border-radius: 8px;
-        background: linear-gradient(180deg, #121b2e 0%, #101728 100%);
-        padding: 8px;
+        border-radius: var(--radius-md);
+        background: var(--panel-soft);
+        padding: 12px;
         display: none;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+        box-shadow: var(--shadow-md);
       }
 
       .avatar-editor-popover.open {
@@ -171,52 +244,121 @@
 
       .avatar-editor-grid {
         display: grid;
-        gap: 6px;
+        gap: 8px;
       }
 
       .avatar-slider-label {
         font-size: 11px;
         color: var(--muted);
         display: block;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .avatar-compare {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--panel);
+      }
+
+      .avatar-compare-item {
+        display: grid;
+        justify-items: center;
+        gap: 4px;
+      }
+
+      .avatar-compare-label {
+        font-size: 10px;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .avatar-compare-arrow {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      button,
+      select {
+        font-family: inherit;
       }
 
       button {
         background: var(--panel-soft);
         color: var(--text);
-        border: 2px solid var(--border);
-        border-radius: 6px;
-        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 12px;
         cursor: pointer;
-        box-shadow: 2px 2px 0 #cbc2b2;
-        transition: border-color 120ms ease, background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.2;
+        box-shadow: none;
+        transition: background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
       }
 
       button:hover {
-        border-color: var(--accent);
         background: var(--button-hover-bg);
-        transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0 #cbc2b2;
+        border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+        transform: none;
+        box-shadow: none;
+      }
+
+      button:focus-visible {
+        outline: none;
+        box-shadow: var(--ring);
       }
 
       button:disabled {
-        opacity: 0.55;
+        opacity: 0.5;
         cursor: not-allowed;
       }
 
+      button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      button.primary:hover {
+        background: color-mix(in srgb, var(--accent) 85%, #fff);
+        border-color: color-mix(in srgb, var(--accent) 85%, #fff);
+      }
+
       .danger {
-        border-color: #7d2c2c;
-        color: #ffb6b6;
+        border-color: color-mix(in srgb, var(--danger) 50%, var(--border));
+        color: var(--danger);
       }
 
       input,
-      textarea {
+      textarea,
+      select {
         width: 100%;
         background: var(--input-bg);
-        border: 2px solid var(--input-border);
+        border: 1px solid var(--input-border);
         color: var(--text);
-        border-radius: 6px;
-        padding: 9px 10px;
-        font-size: 16px;
+        border-radius: var(--radius-sm);
+        padding: 9px 12px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: color-mix(in srgb, var(--muted) 75%, transparent);
+      }
+
+      input:hover,
+      textarea:hover,
+      select:hover {
+        border-color: color-mix(in srgb, var(--muted) 40%, var(--input-border));
       }
 
       input:focus,
@@ -224,46 +366,82 @@
       select:focus {
         outline: none;
         border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(122, 104, 81, 0.18);
+        box-shadow: var(--ring);
       }
 
       textarea {
         resize: none;
-        min-height: 70px;
+        min-height: 64px;
+        line-height: 1.45;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4.5l4 4 4-4' fill='none' stroke='%238691a8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 30px;
+        cursor: pointer;
       }
 
       #messageInput {
-        min-height: 52px;
-        max-height: 120px;
+        min-height: 44px;
+        max-height: 140px;
         overflow-y: auto;
       }
 
       .topics {
         overflow-y: auto;
-        padding: 10px;
+        padding: 8px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 2px;
       }
 
       .topic {
-        border: 2px solid var(--topic-border);
-        background: var(--topic-bg);
-        border-radius: 6px;
-        padding: 10px;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
         text-align: left;
-        box-shadow: 2px 2px 0 #d2c8b8;
+        box-shadow: none;
+        transition: background var(--transition), border-color var(--transition);
+        position: relative;
+      }
+
+      .topic:hover {
+        background: var(--button-hover-bg);
+        border-color: var(--border);
+        transform: none;
+        box-shadow: none;
       }
 
       .topic.active {
-        border-color: var(--topic-active-border);
         background: var(--topic-active-bg);
-        box-shadow: 0 0 0 2px rgba(138, 120, 97, 0.24), 2px 2px 0 #d2c8b8;
+        border-color: var(--border);
+        box-shadow: none;
+      }
+
+      .topic.active::before {
+        content: "";
+        position: absolute;
+        left: -1px;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
       }
 
       .topic-title {
         font-weight: 600;
-        letter-spacing: 0.01em;
+        font-size: 13.5px;
+        letter-spacing: -0.005em;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .topic-head {
@@ -277,15 +455,24 @@
         border: 0;
         background: transparent;
         box-shadow: none;
-        padding: 0;
+        padding: 2px 4px;
         line-height: 1;
-        font-size: 14px;
-        color: var(--muted);
+        font-size: 13px;
+        color: color-mix(in srgb, var(--muted) 70%, transparent);
         transform: none;
+        border-radius: var(--radius-xs);
+        opacity: 0;
+        transition: opacity var(--transition), color var(--transition), background var(--transition);
+      }
+
+      .topic:hover .topic-pin,
+      .topic-pin.pinned,
+      .topic.active .topic-pin {
+        opacity: 1;
       }
 
       .topic-pin:hover {
-        background: transparent;
+        background: color-mix(in srgb, var(--muted) 15%, transparent);
         color: var(--accent);
         transform: none;
         box-shadow: none;
@@ -298,14 +485,22 @@
       .topic-meta {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 11px;
+        font-size: 12px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .room-sort {
-        margin-top: 6px;
+        margin-top: 0;
+      }
+
+      .room-sort strong {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
       }
 
       .checkbox-row {
@@ -316,10 +511,12 @@
 
       .checkbox-row input[type="checkbox"] {
         margin: 0;
+        width: auto;
+        accent-color: var(--accent);
       }
 
       .create-room-row {
-        margin-top: 8px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -329,6 +526,14 @@
       .create-room-panel summary {
         cursor: pointer;
         list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        user-select: none;
       }
 
       .create-room-panel summary::-webkit-details-marker {
@@ -336,26 +541,47 @@
       }
 
       .create-room-panel summary::after {
-        content: " +";
-        color: var(--muted);
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-right: 1.5px solid var(--muted);
+        border-bottom: 1.5px solid var(--muted);
+        transform: rotate(-45deg);
+        transition: transform var(--transition);
+        flex-shrink: 0;
+        margin-right: 3px;
       }
 
       .create-room-panel[open] summary::after {
-        content: " -";
+        transform: rotate(45deg);
+        margin-right: 0;
+        margin-bottom: 3px;
       }
 
       .create-room-body {
-        margin-top: 10px;
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
       }
 
       .header {
-        border-bottom: 2px solid var(--border);
-        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 18px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
         background: var(--header-bg);
+        backdrop-filter: saturate(160%) blur(12px);
+        -webkit-backdrop-filter: saturate(160%) blur(12px);
+        position: relative;
+        z-index: 5;
+      }
+
+      .header strong#topicName {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
       }
 
       .mobile-back {
@@ -365,21 +591,23 @@
       .relay-info {
         color: var(--muted);
         font-size: 12px;
+        margin-top: 2px;
       }
 
       #messages {
         overflow-y: auto;
         flex: 1;
         min-height: 0;
-        padding: 10px 14px;
+        padding: 16px 18px 18px;
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 2px;
       }
 
       .message {
-        padding: 4px 6px;
-        border-radius: 8px;
+        padding: 6px 10px;
+        border-radius: var(--radius-sm);
+        transition: background var(--transition);
       }
 
       .message:hover {
@@ -388,7 +616,7 @@
 
       .message-meta {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         gap: 8px;
         flex-wrap: wrap;
       }
@@ -396,82 +624,192 @@
       .message-author {
         color: var(--author-color);
         font-size: 13px;
-        font-weight: 700;
+        font-weight: 600;
+        letter-spacing: -0.005em;
       }
 
       .message-author-wrap {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        position: relative;
+        cursor: pointer;
       }
 
       .message-time {
         color: var(--muted);
-        font-size: 11px;
+        font-size: 11.5px;
+        font-variant-numeric: tabular-nums;
       }
 
       .message-content {
         white-space: pre-wrap;
-        line-height: 1.38;
+        line-height: 1.5;
         word-break: break-word;
         margin-top: 2px;
+        padding-left: 38px;
+        font-size: 14px;
       }
 
       .message-count {
         background: transparent;
         border: 0;
-        padding: 0;
+        padding: 2px 6px;
         margin-left: 2px;
         cursor: pointer;
         color: var(--reply-link-color);
-        font-size: 11px;
+        font-size: 11.5px;
+        font-weight: 500;
+        border-radius: var(--radius-xs);
+        transition: background var(--transition), color var(--transition);
       }
 
       .message-count:hover {
+        background: var(--accent-soft);
         color: var(--reply-link-hover-color);
-        text-decoration: underline;
+        text-decoration: none;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .message-meta-left {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .message-block {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 6px 8px;
+        font-size: 11px;
+        line-height: 1.2;
+        border-radius: var(--radius-xs);
+        box-shadow: none;
+      }
+
+      .message-block:hover {
+        color: var(--danger);
+        background: color-mix(in srgb, var(--danger) 10%, var(--panel));
+      }
+
+      .message-user-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        display: none;
+        z-index: 20;
+        padding: 6px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--panel);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .message-user-menu.open {
+        display: block;
       }
 
       .composer {
-        border-top: 2px solid var(--border);
-        padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--border);
+        padding: 12px 18px calc(14px + env(safe-area-inset-bottom));
         background: var(--composer-bg);
+        backdrop-filter: saturate(160%) blur(12px);
+        -webkit-backdrop-filter: saturate(160%) blur(12px);
         position: sticky;
         bottom: 0;
         z-index: 6;
       }
 
+      .composer-shell {
+        display: flex;
+        flex-direction: column;
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        border-radius: var(--radius-md);
+        transition: border-color var(--transition), box-shadow var(--transition);
+        overflow: visible;
+      }
+
+      .composer-shell:focus-within {
+        border-color: var(--accent);
+        box-shadow: var(--ring);
+      }
+
+      .composer-shell textarea {
+        border: 0;
+        background: transparent;
+        padding: 11px 14px 6px;
+        border-radius: 0;
+      }
+
+      .composer-shell textarea:focus {
+        outline: none;
+        box-shadow: none;
+        border: 0;
+      }
+
       .composer .row {
         display: flex;
-        gap: 8px;
-        margin-top: 8px;
+        gap: 6px;
+        padding: 4px 6px 6px;
+        align-items: center;
         position: relative;
+      }
+
+      .composer .row button {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .composer .row button:hover {
+        background: color-mix(in srgb, var(--muted) 14%, transparent);
+      }
+
+      .composer #sendMessage,
+      .thread-composer #sendThreadMessage {
+        margin-left: auto;
+        background: var(--accent);
+        color: #fff;
+        border: 0;
+        padding: 7px 14px;
+        font-weight: 600;
+        border-radius: var(--radius-sm);
+      }
+
+      .composer #sendMessage:hover,
+      .thread-composer #sendThreadMessage:hover {
+        background: color-mix(in srgb, var(--accent) 85%, #fff);
       }
 
       .tiny {
         font-size: 12px;
         color: var(--muted);
+        line-height: 1.4;
       }
 
       .notice {
         color: var(--muted);
-        padding: 24px 10px;
+        padding: 40px 20px;
         text-align: center;
+        font-size: 13.5px;
       }
 
       .thread-overlay {
         position: absolute;
         right: 18px;
-        bottom: 96px;
-        width: min(560px, calc(100% - 32px));
-        max-height: 70vh;
-        border: 2px solid var(--accent);
+        bottom: 100px;
+        width: min(520px, calc(100% - 36px));
+        max-height: 72vh;
+        border: 1px solid var(--border);
         background: var(--thread-overlay-bg);
-        border-radius: 8px;
+        border-radius: var(--radius-lg);
         display: none;
         flex-direction: column;
         overflow: hidden;
-        box-shadow: 6px 6px 0 #ccc3b3;
+        box-shadow: var(--shadow-lg);
       }
 
       .thread-overlay.open {
@@ -479,21 +817,31 @@
       }
 
       .thread-header {
-        padding: 10px 12px;
+        padding: 12px 14px;
         border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
 
+      .thread-header strong {
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .thread-header button {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+
       .thread-body {
         overflow-y: auto;
-        padding: 8px;
+        padding: 10px 12px;
       }
 
       .thread-composer {
-        border-top: 2px solid var(--border);
-        padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--border);
+        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
         background: var(--thread-composer-bg);
         position: sticky;
         bottom: 0;
@@ -501,26 +849,32 @@
       }
 
       .emoji-toggle {
-        width: 34px;
+        width: 32px;
+        height: 32px;
         padding: 0;
+        font-size: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
       }
 
       .emoji-picker {
         position: absolute;
-        bottom: 42px;
-        left: 0;
-        width: 220px;
-        max-height: 180px;
+        bottom: 46px;
+        left: 4px;
+        width: 240px;
+        max-height: 200px;
         overflow-y: auto;
-        border: 2px solid var(--emoji-border);
-        border-radius: 6px;
+        border: 1px solid var(--emoji-border);
+        border-radius: var(--radius-md);
         background: var(--emoji-bg);
-        padding: 6px;
+        padding: 8px;
         display: none;
         gap: 4px;
         flex-wrap: wrap;
         z-index: 20;
-        box-shadow: 4px 4px 0 #ccc3b3;
+        box-shadow: var(--shadow-md);
       }
 
       .emoji-picker.open {
@@ -528,82 +882,159 @@
       }
 
       .emoji-item {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         padding: 0;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
+        background: transparent;
+        border: 0;
+      }
+
+      .emoji-item:hover {
+        background: color-mix(in srgb, var(--muted) 15%, transparent);
       }
 
       #threadMessageInput {
-        min-height: 44px;
-        max-height: 96px;
+        min-height: 40px;
+        max-height: 110px;
         overflow-y: auto;
       }
 
+      .thread-composer .composer-shell {
+        border-radius: var(--radius-md);
+        overflow: visible;
+      }
+
+      .thread-composer .row {
+        display: flex;
+        gap: 6px;
+        padding: 4px 6px 6px;
+        align-items: center;
+        position: relative;
+        margin-top: 0;
+      }
+
+      .thread-composer .row button {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .thread-composer .row button:hover {
+        background: color-mix(in srgb, var(--muted) 14%, transparent);
+      }
+
+      .thread-composer #cancelThreadReply {
+        padding: 6px 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
       .thread-node {
-        border: 2px solid var(--thread-node-border);
-        background: var(--thread-node-bg);
-        border-radius: 6px;
-        padding: 6px 8px;
-        margin-bottom: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        margin-bottom: 4px;
         cursor: pointer;
+        transition: background var(--transition), border-color var(--transition);
       }
 
       .thread-node:hover {
-        border-color: var(--thread-node-hover-border);
+        border-color: var(--border);
         background: var(--thread-node-hover-bg);
       }
 
       .thread-children {
-        margin-top: 4px;
-        padding-left: 12px;
-        border-left: 1px dashed #3b4a65;
+        margin-top: 2px;
+        padding-left: 14px;
+        border-left: 1px solid var(--border);
+        margin-left: 10px;
       }
 
       .hidden {
         display: none;
       }
 
-      .advanced-fab {
-        position: fixed;
-        right: 14px;
-        bottom: 14px;
-        width: 30px;
-        height: 30px;
-        border-radius: 999px;
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .header-icon-btn {
+        width: 32px;
+        height: 32px;
         padding: 0;
-        font-size: 14px;
+        border-radius: var(--radius-sm);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        z-index: 30;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--muted);
+        box-shadow: none;
       }
 
-      .share-fab {
-        position: fixed;
-        right: 54px;
-        bottom: 14px;
-        z-index: 30;
+      .header-icon-btn:hover {
+        background: var(--button-hover-bg);
+        color: var(--text);
+        border-color: var(--border);
+      }
+
+      .status-pill {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--muted);
+        background: color-mix(in srgb, var(--muted) 10%, transparent);
+        border: 1px solid var(--border);
+        padding: 3px 9px;
+        border-radius: var(--radius-pill);
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .status-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-pill);
+        background: var(--muted);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent);
+      }
+
+      .status-pill.live::before {
+        background: #22c55e;
+        animation: pulse-dot 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-dot {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+        50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
       }
 
       .advanced-panel {
         position: fixed;
-        right: 14px;
-        bottom: 50px;
-        width: min(360px, calc(100vw - 24px));
-        max-height: 70vh;
+        right: 16px;
+        top: 60px;
+        width: min(380px, calc(100vw - 32px));
+        max-height: calc(100vh - 80px);
         overflow-y: auto;
-        border: 2px solid var(--floating-panel-border);
+        border: 1px solid var(--floating-panel-border);
         background: var(--floating-panel-bg);
-        border-radius: 8px;
-        padding: 10px;
+        backdrop-filter: saturate(160%) blur(14px);
+        -webkit-backdrop-filter: saturate(160%) blur(14px);
+        border-radius: var(--radius-lg);
+        padding: 16px;
         display: none;
         z-index: 30;
-        box-shadow: 6px 6px 0 #ccc3b3;
+        box-shadow: var(--shadow-lg);
       }
 
       .advanced-panel.open {
@@ -611,35 +1042,55 @@
       }
 
       .advanced-panel h4 {
-        margin: 4px 0 6px 0;
+        margin: 14px 0 6px 0;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+
+      .advanced-panel h4:first-child {
+        margin-top: 0;
       }
 
       .share-panel {
         position: fixed;
-        right: 54px;
-        bottom: 50px;
-        width: min(360px, calc(100vw - 24px));
-        border: 2px solid var(--floating-panel-border);
+        right: 16px;
+        top: 60px;
+        width: min(340px, calc(100vw - 32px));
+        border: 1px solid var(--floating-panel-border);
         background: var(--floating-panel-bg);
-        border-radius: 8px;
-        padding: 10px;
+        backdrop-filter: saturate(160%) blur(14px);
+        -webkit-backdrop-filter: saturate(160%) blur(14px);
+        border-radius: var(--radius-lg);
+        padding: 16px;
         display: none;
         z-index: 30;
-        box-shadow: 6px 6px 0 #ccc3b3;
+        box-shadow: var(--shadow-lg);
       }
 
       .share-panel.open {
         display: block;
       }
 
+      .share-panel h4 {
+        margin: 0 0 4px 0;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+      }
+
       .share-link-row {
         display: flex;
         gap: 8px;
-        margin-top: 8px;
+        margin-top: 10px;
       }
 
       .share-link-row input {
         flex: 1;
+        font-family: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+        font-size: 12px;
       }
 
       .key-export-row {
@@ -648,26 +1099,78 @@
         margin-top: 8px;
       }
 
-      #exportNsecValue {
+      .blocked-list {
+        display: grid;
+        gap: 6px;
         margin-top: 8px;
-        border: 2px solid var(--input-border);
+      }
+
+      .blocked-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 7px 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--panel);
+      }
+
+      .blocked-item code {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .advanced-subpanel {
+        margin-top: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--panel);
+        overflow: hidden;
+      }
+
+      .advanced-subpanel > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 10px 12px;
+        font-weight: 600;
+        border-bottom: 1px solid transparent;
+      }
+
+      .advanced-subpanel > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .advanced-subpanel[open] > summary {
+        border-bottom-color: var(--border);
+      }
+
+      .advanced-subpanel-body {
+        padding: 10px 12px 12px;
+      }
+
+      #exportNsecValue {
+        margin-top: 10px;
+        border: 1px solid var(--input-border);
         background: var(--input-bg);
-        border-radius: 6px;
-        padding: 8px;
-        font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
         font-size: 12px;
-        line-height: 1.35;
+        line-height: 1.4;
         color: var(--text);
         word-break: break-all;
       }
 
       #shareQr {
-        margin-top: 10px;
+        margin-top: 12px;
         width: 180px;
         height: 180px;
-        border: 2px solid var(--floating-panel-border);
+        border-radius: var(--radius-md);
         background: var(--qr-bg);
         overflow: hidden;
+        padding: 8px;
+        box-shadow: var(--shadow-sm);
       }
 
       #shareQr svg,
@@ -675,20 +1178,6 @@
         width: 100%;
         height: 100%;
         display: block;
-      }
-
-      @media (max-width: 840px) {
-        .share-fab {
-          right: 54px;
-          bottom: calc(14px + env(safe-area-inset-bottom));
-        }
-
-        .share-panel {
-          right: 12px;
-          left: 12px;
-          width: auto;
-          bottom: calc(52px + env(safe-area-inset-bottom));
-        }
       }
 
       @media (max-width: 840px) {
@@ -711,18 +1200,28 @@
 
         .mobile-back {
           display: inline-flex;
-          width: 30px;
-          height: 30px;
+          width: 32px;
+          height: 32px;
           padding: 0;
-          border-radius: 999px;
+          border-radius: var(--radius-pill);
           align-items: center;
           justify-content: center;
+          background: transparent;
+          border: 1px solid var(--border);
+          color: var(--muted);
+          box-shadow: none;
+          font-size: 16px;
+        }
+
+        .mobile-back:hover {
+          background: var(--button-hover-bg);
+          color: var(--text);
         }
 
         .header-left {
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 10px;
           min-width: 0;
         }
 
@@ -732,11 +1231,34 @@
 
         #topicName {
           display: block;
-        font-weight: 700;
-        letter-spacing: 0.02em;
+          font-weight: 600;
+          letter-spacing: -0.01em;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+        }
+
+        .share-panel,
+        .advanced-panel {
+          right: 12px;
+          left: 12px;
+          width: auto;
+          top: 58px;
+        }
+
+        .thread-overlay {
+          right: 12px;
+          left: 12px;
+          width: auto;
+          bottom: 110px;
+        }
+
+        .header {
+          padding: 10px 12px;
+        }
+
+        #status {
+          display: none;
         }
       }
     </style>
@@ -760,17 +1282,29 @@
               <label class="avatar-slider-label">Green <input id="avatarGreen" type="range" min="0" max="255" /></label>
               <label class="avatar-slider-label">Blue <input id="avatarBlue" type="range" min="0" max="255" /></label>
               <label class="avatar-slider-label">Hex <input id="avatarHexInput" type="text" placeholder="#ffd166" maxlength="7" /></label>
+              <div class="avatar-compare">
+                <div class="avatar-compare-item">
+                  <span class="avatar-compare-label">Before</span>
+                  <span id="avatarBeforePreview" class="avatar-face"></span>
+                </div>
+                <span class="avatar-compare-arrow">→</span>
+                <div class="avatar-compare-item">
+                  <span class="avatar-compare-label">After</span>
+                  <span id="avatarAfterPreview" class="avatar-face"></span>
+                </div>
+              </div>
+              <button id="saveAvatar" type="button">Save avatar</button>
             </div>
           </div>
         </section>
 
         <details class="panel create-room-panel">
-          <summary><strong>Start a room</strong></summary>
+          <summary><span>Start a room</span></summary>
           <div class="create-room-body">
             <input id="newTopicName" type="text" placeholder="Room name" />
             <textarea id="newTopicAbout" placeholder="What are people reacting to?"></textarea>
             <div class="create-room-row">
-              <button id="createTopic" type="button">Start room</button>
+              <button id="createTopic" class="primary" type="button">Start room</button>
               <label class="tiny checkbox-row">
                 <span>unlisted</span>
                 <input id="newTopicUnlisted" type="checkbox" />
@@ -781,10 +1315,10 @@
         </details>
 
         <section class="panel room-sort">
-          <strong>Sort rooms</strong>
+          <strong>Rooms</strong>
           <select id="roomSortMode" style="margin-top: 8px">
             <option value="newest">Newest</option>
-            <option value="active">Recently active</option>
+            <option value="active" selected>Recently active</option>
             <option value="hot">Most active</option>
           </select>
         </section>
@@ -801,7 +1335,15 @@
               <div class="relay-info" id="topicMeta"></div>
             </div>
           </div>
-          <div class="tiny" id="status">Getting ready...</div>
+          <div class="header-right">
+            <span class="status-pill" id="status">Getting ready...</span>
+            <button id="shareToggle" class="header-icon-btn" type="button" title="Share room" aria-label="Share room">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </button>
+            <button id="advancedToggle" class="header-icon-btn" type="button" title="Settings" aria-label="Settings">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+          </div>
         </section>
 
         <section id="messages">
@@ -809,85 +1351,127 @@
         </section>
 
         <section class="composer">
-          <textarea id="messageInput" placeholder=""></textarea>
-          <div class="row">
-            <button id="messageEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji">😊</button>
-            <button id="sendMessage" type="button">Send</button>
-            <div id="messageEmojiPicker" class="emoji-picker"></div>
+          <div class="composer-shell">
+            <textarea id="messageInput" placeholder="Message the room..."></textarea>
+            <div class="row">
+              <button id="messageEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji" aria-label="Insert emoji">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>
+              </button>
+              <button id="sendMessage" type="button">Send</button>
+              <div id="messageEmojiPicker" class="emoji-picker"></div>
+            </div>
           </div>
         </section>
 
         <section class="thread-overlay" id="threadOverlay">
           <div class="thread-header">
-            <strong>Game thread</strong>
+            <strong>Thread</strong>
             <button id="closeThread" type="button">Close</button>
           </div>
           <div class="thread-body" id="threadBody"></div>
           <div class="thread-composer">
-            <div id="threadReplyHint" class="tiny"></div>
-            <textarea id="threadMessageInput" placeholder="Reply in thread..."></textarea>
-            <div class="row">
-              <button id="threadEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji">😊</button>
-              <button id="sendThreadMessage" type="button">Send</button>
-              <button id="cancelThreadReply" type="button">Reply to top</button>
-              <div id="threadEmojiPicker" class="emoji-picker"></div>
+            <div id="threadReplyHint" class="tiny" style="padding: 0 2px 6px"></div>
+            <div class="composer-shell">
+              <textarea id="threadMessageInput" placeholder="Reply in thread..."></textarea>
+              <div class="row">
+                <button id="threadEmojiToggle" class="emoji-toggle" type="button" title="Insert emoji" aria-label="Insert emoji">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>
+                </button>
+                <button id="cancelThreadReply" type="button">Reply to top</button>
+                <button id="sendThreadMessage" type="button">Send</button>
+                <div id="threadEmojiPicker" class="emoji-picker"></div>
+              </div>
             </div>
           </div>
         </section>
       </main>
     </div>
 
-    <button id="advancedToggle" class="advanced-fab" type="button" title="Advanced settings">⚙</button>
-    <button id="shareToggle" class="advanced-fab share-fab" type="button" title="Share room">↗</button>
     <section id="advancedPanel" class="advanced-panel">
-      <h4>Advanced settings</h4>
-      <p class="tiny">Most users can ignore this.</p>
+      <h4>Settings</h4>
 
       <h4>Profanity display</h4>
       <div class="tiny">Messages are never blocked for profanity; this only changes what viewers see.</div>
-      <div style="display: grid; gap: 8px; margin-top: 8px">
-        <label class="tiny">
-          Profanity filter
-          <select id="profanityToggle" style="margin-top: 4px">
-            <option value="on">On (mask basic profanity)</option>
-            <option value="off">Off (show original text)</option>
-          </select>
-        </label>
-      </div>
+      <label class="tiny" style="display: block; margin-top: 8px">
+        <select id="profanityToggle" style="margin-top: 4px">
+          <option value="on">On (mask basic profanity)</option>
+          <option value="off">Off (show original text)</option>
+        </select>
+      </label>
+      <label class="tiny" style="display: block; margin-top: 8px">
+        <select id="legacyAvatarCodeToggle" style="margin-top: 4px">
+          <option value="on">Hide legacy avatar codes</option>
+          <option value="off">Show legacy avatar codes</option>
+        </select>
+      </label>
 
-      <h4 style="margin-top: 12px">Theme</h4>
-      <label class="tiny">
-        Style preset
+      <h4>Theme</h4>
+      <label class="tiny" style="display: block">
         <select id="themePreset" style="margin-top: 4px">
-          <option value="sepia">Sepia Classic</option>
-          <option value="paper">Paper Bright</option>
-          <option value="night">Midnight Neon</option>
+          <option value="night">Midnight</option>
+          <option value="paper">Daylight</option>
+          <option value="sepia">Warm Sepia</option>
           <option value="mono">Mono Terminal</option>
         </select>
       </label>
 
-      <h4 style="margin-top: 12px">User key backup</h4>
-      <div class="tiny">Save this key somewhere safe if you want to keep this same user identity.</div>
-      <div class="key-export-row">
-        <button id="revealNsec" type="button">Reveal key</button>
-        <button id="copyNsec" type="button">Copy key</button>
-      </div>
-      <div id="exportNsecValue" class="tiny hidden"></div>
-
-      <h4>Connection settings</h4>
-      <textarea id="relayInput"></textarea>
-      <div style="display: flex; gap: 8px; margin-top: 8px">
-        <button id="saveRelays" type="button">Save settings</button>
-        <button id="reconnect" type="button">Reconnect</button>
+      <h4 style="margin-top: 12px">Blocked users (local)</h4>
+      <div class="tiny">Blocked users are hidden in this client only.</div>
+      <div id="blockedUsersList" class="blocked-list">
+        <div class="tiny">No blocked users.</div>
       </div>
 
-      <h4 style="margin-top: 12px">Join room by code</h4>
-      <input id="joinTopicId" type="text" placeholder="Paste room code" />
-      <button id="joinTopic" type="button" style="margin-top: 8px">Join room</button>
+      <details id="advancedCryptoPanel" class="advanced-subpanel">
+        <summary>Advanced</summary>
+        <div class="advanced-subpanel-body">
+          <h4 style="margin-top: 0">Connection settings</h4>
+          <textarea id="relayInput"></textarea>
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button id="saveRelays" type="button">Save settings</button>
+            <button id="reconnect" type="button">Reconnect</button>
+          </div>
+
+          <h4 style="margin-top: 12px">Join room by code</h4>
+          <input id="joinTopicId" type="text" placeholder="Paste room code" />
+          <button id="joinTopic" type="button" style="margin-top: 8px">Join room</button>
+
+          <h4 style="margin-top: 12px">User key backup</h4>
+          <div class="tiny">Save this key somewhere safe to keep the same identity across devices.</div>
+          <div class="key-export-row">
+            <button id="revealNsec" type="button">Reveal key</button>
+            <button id="copyNsec" type="button">Copy key</button>
+          </div>
+          <div id="exportNsecValue" class="tiny hidden"></div>
+
+          <h4 style="margin-top: 12px">Set user key</h4>
+          <div class="tiny">Paste an nsec key to switch to an existing identity on this device.</div>
+          <input id="setNsecInput" type="text" placeholder="nsec1..." style="margin-top: 8px" />
+          <button id="applyNsec" type="button" style="margin-top: 8px">Set key</button>
+
+          <h4 style="margin-top: 12px">Moderation engine</h4>
+          <div class="tiny">Choose how much filtering logic this client downloads and runs.</div>
+          <label class="tiny" style="display: block; margin-top: 8px">
+            <select id="moderationMode" style="margin-top: 4px">
+              <option value="minimal">Minimal (no heavy model/downloads)</option>
+              <option value="balanced">Balanced (enhanced text filters)</option>
+              <option value="max">Max (balanced + ML send check)</option>
+            </select>
+          </label>
+
+          <h4 style="margin-top: 12px">Client filter pack (optional)</h4>
+          <div class="tiny">Advanced local filter plugin URL. Runs on-device only.</div>
+          <input id="filterPackUrl" type="text" placeholder="https://example.com/filter-pack.mjs" style="margin-top: 8px" />
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button id="downloadFilterPack" type="button">Download pack</button>
+            <button id="clearFilterPack" type="button">Clear pack</button>
+          </div>
+          <div id="filterPackStatus" class="tiny" style="margin-top: 6px">No pack loaded.</div>
+        </div>
+      </details>
     </section>
     <section id="sharePanel" class="share-panel">
       <h4>Share room</h4>
-      <div class="tiny" id="shareRoomName">No room selected</div>
+      <div class="tiny" id="shareRoomName" style="margin-top: 2px">No room selected</div>
       <div class="share-link-row">
         <input id="shareLinkInput" type="text" readonly />
         <button id="copyShareLink" type="button">Copy</button>
@@ -3210,7 +3794,12 @@
         nsec: "gigachat:nsec",
         relays: "gigachat:relays",
         avatar: "gigachat:avatar",
+        blockedPubkeys: "gigachat:blockedPubkeys",
+        moderationMode: "gigachat:moderationMode",
+        filterPackUrl: "gigachat:filterPackUrl",
+        filterPackSource: "gigachat:filterPackSource",
         profanityToggle: "gigachat:profanityToggle",
+        legacyAvatarCodeToggle: "gigachat:legacyAvatarCodeToggle",
         themePreset: "gigachat:themePreset",
         pinnedRooms: "gigachat:pinnedRooms",
       };
@@ -3224,6 +3813,8 @@
       const HANDLE_MASCOTS = ["Falcon", "Slugger", "Rookie", "Captain", "Hustler", "Charger", "Ace", "Comet", "Baller", "MVP"];
       const APP_ROOM_MARKER_TAG = "gigachat-room-v1";
       const APP_ROOM_MARKER_FIELD = "gigachat_room_v1";
+      const GIGACHAT_AVATAR_KIND = 30078;
+      const GIGACHAT_ROOM_STATS_KIND = 14578;
       const AUTOPIN_QUERY_PARAM = "pin";
       const AUTOPIN_QUERY_VALUE = "1";
       const MESSAGE_FETCH_LIMIT = 220;
@@ -3232,7 +3823,9 @@
       const PUBLIC_SHARE_BASE_URL = "https://opengroupchat.com/";
       const AVATAR_EYE_COUNT = 9;
       const AVATAR_MOUTH_COUNT = 9;
-      const AVATAR_TOKEN_RE = /^\[\[ga:e(\d+)m(\d+)h([0-9a-fA-F]{6})\]\]\s*/;
+      const ROOM_STATS_WINDOW_SEC = 900;
+      const ROOM_STATS_OLDEST_SLICE = 24;
+      const LEGACY_AVATAR_TOKEN_RE = /^\[\[ga:e(\d+)m(\d+)h([0-9a-fA-F]{6})\]\]\s*/;
       const MAX_URLS_PER_MESSAGE = 2;
       const MAX_REPEAT_RUN = 11;
       const BRAILLE_SPAM_THRESHOLD = 8;
@@ -3240,157 +3833,165 @@
       const BASIC_ALLOWED_PROFANITY = ["ass", "asses", "asshole", "assholes", "crap", "damn", "dick", "fuck", "fucking", "fucks", "hell", "piss", "shit", "shits", "wtf"];
       const TOXICITY_MODEL_THRESHOLD = 0.85;
       const TOXICITY_MODEL_LABELS = ["toxicity", "insult", "threat", "obscene", "identity_attack"];
+      const MODERATION_MODE_MINIMAL = "minimal";
+      const MODERATION_MODE_BALANCED = "balanced";
+      const MODERATION_MODE_MAX = "max";
+      const MODERN_FONT = '"Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Ubuntu, sans-serif';
       const THEME_PRESETS = {
-        sepia: {
-          font: '"Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif',
-          bg: "#f1ece1",
-          bgGlow1: "#e7dfd0",
-          bgGlow2: "#ddd3c3",
-          panel: "#faf8f1",
-          panelSoft: "#efe8d9",
-          asideBg: "#ebe4d4",
-          inputBg: "#f7f2e7",
-          inputBorder: "#b2a899",
-          topicBg: "#f8f4ea",
-          topicBorder: "#b1a796",
-          topicActiveBg: "#f1e8d8",
-          topicActiveBorder: "#8a7861",
-          buttonHoverBg: "#e4dccd",
-          headerBg: "#f5efe3",
-          composerBg: "#f3ecde",
-          threadOverlayBg: "#f8f4eb",
-          threadComposerBg: "#f1e9db",
-          emojiBg: "#f7f1e5",
-          emojiBorder: "#b3a999",
-          threadNodeBg: "#f6f0e3",
-          threadNodeBorder: "#b6ad9f",
-          threadNodeHoverBg: "#eee5d6",
-          threadNodeHoverBorder: "#8a7861",
-          floatingPanelBg: "#f5eee2",
-          floatingPanelBorder: "#b2a898",
-          qrBg: "#ffffff",
-          authorColor: "#5d4f3d",
-          replyLinkColor: "#6a5a45",
-          replyLinkHoverColor: "#3f3529",
-          messageHoverBg: "rgba(151, 135, 112, 0.18)",
-          border: "#a89f8f",
-          text: "#2f2a23",
-          muted: "#72695b",
-          accent: "#7a6851",
-          danger: "#a34a40",
+        night: {
+          font: MODERN_FONT,
+          bg: "#0b0d12",
+          bgGlow1: "#171c28",
+          bgGlow2: "#0e1320",
+          panel: "#12151d",
+          panelSoft: "#1a1e28",
+          asideBg: "#0f1219",
+          inputBg: "#141824",
+          inputBorder: "#262c3a",
+          topicBg: "#141824",
+          topicBorder: "#232938",
+          topicActiveBg: "#1b2334",
+          topicActiveBorder: "#6d8bff",
+          buttonHoverBg: "#1f2432",
+          headerBg: "rgba(14, 17, 24, 0.72)",
+          composerBg: "rgba(14, 17, 24, 0.72)",
+          threadOverlayBg: "#141824",
+          threadComposerBg: "rgba(16, 20, 28, 0.85)",
+          emojiBg: "#161b27",
+          emojiBorder: "#262c3a",
+          threadNodeBg: "#151a26",
+          threadNodeBorder: "#232938",
+          threadNodeHoverBg: "#1b2130",
+          threadNodeHoverBorder: "#6d8bff",
+          floatingPanelBg: "rgba(18, 22, 32, 0.92)",
+          floatingPanelBorder: "#262c3a",
+          qrBg: "#f4f5f8",
+          authorColor: "#e6ebff",
+          replyLinkColor: "#9aa5c4",
+          replyLinkHoverColor: "#c9d2ef",
+          messageHoverBg: "rgba(109, 139, 255, 0.06)",
+          border: "#22283a",
+          text: "#e5e8ef",
+          muted: "#8691a8",
+          accent: "#6d8bff",
+          accentSoft: "rgba(109, 139, 255, 0.14)",
+          danger: "#ff6b7a",
         },
         paper: {
-          font: '"Source Serif 4", "Times New Roman", Times, serif',
-          bg: "#f7f7f4",
+          font: MODERN_FONT,
+          bg: "#fafaf7",
           bgGlow1: "#ffffff",
-          bgGlow2: "#e8e8de",
+          bgGlow2: "#f1f0ea",
           panel: "#ffffff",
-          panelSoft: "#ecece6",
-          asideBg: "#efefe8",
+          panelSoft: "#f5f4ef",
+          asideBg: "#f5f4ef",
           inputBg: "#ffffff",
-          inputBorder: "#b9b9aa",
+          inputBorder: "#e2e0d7",
           topicBg: "#ffffff",
-          topicBorder: "#b4b4a7",
-          topicActiveBg: "#f0f0e8",
-          topicActiveBorder: "#8b8b7e",
-          buttonHoverBg: "#e4e4da",
-          headerBg: "#f3f3ec",
-          composerBg: "#efefe7",
-          threadOverlayBg: "#f8f8f2",
-          threadComposerBg: "#ecece4",
-          emojiBg: "#fbfbf7",
-          emojiBorder: "#bdbdb0",
-          threadNodeBg: "#f5f5ee",
-          threadNodeBorder: "#b9b9ac",
-          threadNodeHoverBg: "#ecece2",
-          threadNodeHoverBorder: "#8b8b7e",
-          floatingPanelBg: "#f5f5ef",
-          floatingPanelBorder: "#bdbdb0",
+          topicBorder: "#ebe9e0",
+          topicActiveBg: "#edeee8",
+          topicActiveBorder: "#5865f2",
+          buttonHoverBg: "#eeece4",
+          headerBg: "rgba(250, 250, 247, 0.78)",
+          composerBg: "rgba(250, 250, 247, 0.78)",
+          threadOverlayBg: "#ffffff",
+          threadComposerBg: "rgba(245, 244, 239, 0.85)",
+          emojiBg: "#ffffff",
+          emojiBorder: "#e2e0d7",
+          threadNodeBg: "#ffffff",
+          threadNodeBorder: "#ebe9e0",
+          threadNodeHoverBg: "#f3f2ec",
+          threadNodeHoverBorder: "#5865f2",
+          floatingPanelBg: "rgba(255, 255, 255, 0.92)",
+          floatingPanelBorder: "#e2e0d7",
           qrBg: "#ffffff",
-          authorColor: "#4b5159",
-          replyLinkColor: "#5a616b",
-          replyLinkHoverColor: "#3f464f",
-          messageHoverBg: "rgba(118, 118, 98, 0.16)",
-          border: "#a8a899",
-          text: "#262623",
-          muted: "#68685f",
-          accent: "#5b6b78",
-          danger: "#9d4242",
+          authorColor: "#1a1f2b",
+          replyLinkColor: "#5a6072",
+          replyLinkHoverColor: "#1a1f2b",
+          messageHoverBg: "rgba(88, 101, 242, 0.06)",
+          border: "#e7e5dc",
+          text: "#1a1f2b",
+          muted: "#6b7184",
+          accent: "#5865f2",
+          accentSoft: "rgba(88, 101, 242, 0.12)",
+          danger: "#d44052",
         },
-        night: {
-          font: '"Avenir Next", "Segoe UI", Inter, system-ui, sans-serif',
-          bg: "#0f1217",
-          bgGlow1: "#1a1f2b",
-          bgGlow2: "#101820",
-          panel: "#161b22",
-          panelSoft: "#202734",
-          asideBg: "#131923",
-          inputBg: "#1d2430",
-          inputBorder: "#334257",
-          topicBg: "#1b2230",
-          topicBorder: "#354258",
-          topicActiveBg: "#21314b",
-          topicActiveBorder: "#63b3ed",
-          buttonHoverBg: "#263449",
-          headerBg: "#171f2b",
-          composerBg: "#141b27",
-          threadOverlayBg: "#172030",
-          threadComposerBg: "#111927",
-          emojiBg: "#1d2736",
-          emojiBorder: "#3a4b63",
-          threadNodeBg: "#1b2637",
-          threadNodeBorder: "#3d506b",
-          threadNodeHoverBg: "#223149",
-          threadNodeHoverBorder: "#63b3ed",
-          floatingPanelBg: "#192233",
-          floatingPanelBorder: "#3a4b63",
-          qrBg: "#f8fbff",
-          authorColor: "#9dd6ff",
-          replyLinkColor: "#a8c7e8",
-          replyLinkHoverColor: "#d2e8ff",
-          messageHoverBg: "rgba(99, 179, 237, 0.17)",
-          border: "#3a475c",
-          text: "#dce6f2",
-          muted: "#97a9bf",
-          accent: "#63b3ed",
-          danger: "#ff7a8a",
+        sepia: {
+          font: MODERN_FONT,
+          bg: "#f5f0e4",
+          bgGlow1: "#fbf6eb",
+          bgGlow2: "#ede5d3",
+          panel: "#fbf7ec",
+          panelSoft: "#f1ebdc",
+          asideBg: "#efe9d9",
+          inputBg: "#fbf7ec",
+          inputBorder: "#d9cfb7",
+          topicBg: "#fbf7ec",
+          topicBorder: "#e2d9c1",
+          topicActiveBg: "#efe7d2",
+          topicActiveBorder: "#8a6a3a",
+          buttonHoverBg: "#ebe2cd",
+          headerBg: "rgba(245, 240, 228, 0.78)",
+          composerBg: "rgba(245, 240, 228, 0.78)",
+          threadOverlayBg: "#fbf7ec",
+          threadComposerBg: "rgba(241, 235, 220, 0.85)",
+          emojiBg: "#fbf7ec",
+          emojiBorder: "#d9cfb7",
+          threadNodeBg: "#fbf7ec",
+          threadNodeBorder: "#e2d9c1",
+          threadNodeHoverBg: "#ede5d0",
+          threadNodeHoverBorder: "#8a6a3a",
+          floatingPanelBg: "rgba(251, 247, 236, 0.94)",
+          floatingPanelBorder: "#d9cfb7",
+          qrBg: "#ffffff",
+          authorColor: "#3b2d1a",
+          replyLinkColor: "#6e5a3b",
+          replyLinkHoverColor: "#3b2d1a",
+          messageHoverBg: "rgba(138, 106, 58, 0.08)",
+          border: "#dbd1b8",
+          text: "#2b2213",
+          muted: "#7a6d52",
+          accent: "#8a6a3a",
+          accentSoft: "rgba(138, 106, 58, 0.14)",
+          danger: "#b34a3e",
         },
         mono: {
-          font: '"IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace',
-          bg: "#101010",
-          bgGlow1: "#1a1a1a",
+          font: '"JetBrains Mono", "SF Mono", "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace',
+          bg: "#0a0a0a",
+          bgGlow1: "#141414",
           bgGlow2: "#080808",
-          panel: "#161616",
-          panelSoft: "#202020",
-          asideBg: "#141414",
-          inputBg: "#1c1c1c",
-          inputBorder: "#4a4a4a",
-          topicBg: "#191919",
-          topicBorder: "#484848",
-          topicActiveBg: "#222222",
+          panel: "#111111",
+          panelSoft: "#181818",
+          asideBg: "#0d0d0d",
+          inputBg: "#131313",
+          inputBorder: "#242424",
+          topicBg: "#111111",
+          topicBorder: "#222222",
+          topicActiveBg: "#181818",
           topicActiveBorder: "#86efac",
-          buttonHoverBg: "#292929",
-          headerBg: "#191919",
-          composerBg: "#161616",
-          threadOverlayBg: "#1a1a1a",
-          threadComposerBg: "#141414",
-          emojiBg: "#1e1e1e",
-          emojiBorder: "#525252",
-          threadNodeBg: "#1c1c1c",
-          threadNodeBorder: "#5a5a5a",
-          threadNodeHoverBg: "#232323",
+          buttonHoverBg: "#1c1c1c",
+          headerBg: "rgba(10, 10, 10, 0.72)",
+          composerBg: "rgba(10, 10, 10, 0.72)",
+          threadOverlayBg: "#111111",
+          threadComposerBg: "rgba(13, 13, 13, 0.85)",
+          emojiBg: "#131313",
+          emojiBorder: "#242424",
+          threadNodeBg: "#111111",
+          threadNodeBorder: "#222222",
+          threadNodeHoverBg: "#181818",
           threadNodeHoverBorder: "#86efac",
-          floatingPanelBg: "#1a1a1a",
-          floatingPanelBorder: "#525252",
-          qrBg: "#fbfbfb",
-          authorColor: "#a7f3d0",
-          replyLinkColor: "#a3a3a3",
-          replyLinkHoverColor: "#e5e5e5",
-          messageHoverBg: "rgba(134, 239, 172, 0.16)",
-          border: "#4a4a4a",
-          text: "#ececec",
-          muted: "#b0b0b0",
+          floatingPanelBg: "rgba(17, 17, 17, 0.92)",
+          floatingPanelBorder: "#242424",
+          qrBg: "#fafafa",
+          authorColor: "#e5e5e5",
+          replyLinkColor: "#888888",
+          replyLinkHoverColor: "#d4d4d4",
+          messageHoverBg: "rgba(134, 239, 172, 0.05)",
+          border: "#1f1f1f",
+          text: "#e5e5e5",
+          muted: "#888888",
           accent: "#86efac",
+          accentSoft: "rgba(134, 239, 172, 0.12)",
           danger: "#fb7185",
         },
       };
@@ -3407,20 +4008,30 @@
       let topicSub = null;
       let roomActivitySub = null;
       let messageSub = null;
+      let avatarSub = null;
       let currentChannelId = "";
       let replyTarget = null;
       let openThreadRootId = null;
       let myAvatar = { e: 0, m: 0, hex: "ffd166" };
-      let roomSortMode = "newest";
+      let roomSortMode = "active";
       let activityRefreshTimer = null;
       let isMobileChatOpen = false;
       let profanityToggle = "on";
-      let themePreset = "sepia";
+      let legacyAvatarCodeToggle = "on";
+      let themePreset = "night";
       let pinnedRoomOrder = [];
+      let draftAvatar = null;
+      let moderationMode = MODERATION_MODE_BALANCED;
+      let moderationDependenciesLoaded = false;
+      let filterPack = null;
+      let blockedPubkeys = new Set();
 
       const topicsById = new Map();
       const messagesById = new Map();
       const roomStats = new Map();
+      const avatarsByPubkey = new Map();
+      const avatarEventTimeByPubkey = new Map();
+      const roomStatsByRoomId = new Map();
 
       const identityCode = document.getElementById("identityCode");
       const relayInput = document.getElementById("relayInput");
@@ -3442,11 +4053,21 @@
       const threadEmojiPicker = document.getElementById("threadEmojiPicker");
       const advancedToggle = document.getElementById("advancedToggle");
       const advancedPanel = document.getElementById("advancedPanel");
+      const advancedCryptoPanel = document.getElementById("advancedCryptoPanel");
+      const setNsecInput = document.getElementById("setNsecInput");
+      const applyNsecButton = document.getElementById("applyNsec");
+      const moderationModeSelect = document.getElementById("moderationMode");
+      const filterPackUrlInput = document.getElementById("filterPackUrl");
+      const downloadFilterPackButton = document.getElementById("downloadFilterPack");
+      const clearFilterPackButton = document.getElementById("clearFilterPack");
+      const filterPackStatus = document.getElementById("filterPackStatus");
       const profanityToggleSelect = document.getElementById("profanityToggle");
+      const legacyAvatarCodeToggleSelect = document.getElementById("legacyAvatarCodeToggle");
       const themePresetSelect = document.getElementById("themePreset");
       const revealNsecButton = document.getElementById("revealNsec");
       const copyNsecButton = document.getElementById("copyNsec");
       const exportNsecValue = document.getElementById("exportNsecValue");
+      const blockedUsersList = document.getElementById("blockedUsersList");
       const shareToggle = document.getElementById("shareToggle");
       const sharePanel = document.getElementById("sharePanel");
       const shareRoomName = document.getElementById("shareRoomName");
@@ -3462,6 +4083,9 @@
       const avatarGreen = document.getElementById("avatarGreen");
       const avatarBlue = document.getElementById("avatarBlue");
       const avatarHexInput = document.getElementById("avatarHexInput");
+      const avatarBeforePreview = document.getElementById("avatarBeforePreview");
+      const avatarAfterPreview = document.getElementById("avatarAfterPreview");
+      const saveAvatarButton = document.getElementById("saveAvatar");
       const EMOJIS = [
         "😀",
         "😂",
@@ -3490,8 +4114,23 @@
       ];
       const QR_SIZE = 180;
 
-      function setStatus(text) {
-        status.textContent = text;
+      function setStatus(text, detail = "") {
+        status.textContent = detail ? `${text} - ${detail}` : text;
+        status.classList.toggle("live", /^(live|connected)$/i.test(String(text).trim()));
+      }
+
+      function formatMessagesPerHourLabel(roomId = currentChannelId) {
+        if (!roomId) return "";
+        const rateInfo = roomStatsByRoomId.get(roomId);
+        if (!rateInfo?.msgsPerHour) return "";
+        const n = Math.max(0, Math.round(rateInfo.msgsPerHour));
+        return `${n} message${n === 1 ? "" : "s"} per hour`;
+      }
+
+      function refreshLiveRateStatus() {
+        const isLive = /^(live|connected)$/i.test(String(status.textContent || "").split(" - ")[0].trim());
+        if (!isLive) return;
+        setStatus("Live", formatMessagesPerHourLabel(currentChannelId));
       }
 
       function shorten(v) {
@@ -3593,33 +4232,120 @@
         return `<span class="avatar-face">${avatarSvg(config)}</span>`;
       }
 
-      function avatarToken(config) {
-        const avatar = normalizeAvatarConfig(config);
-        return `[[ga:e${avatar.e}m${avatar.m}h${avatar.hex}]]`;
-      }
-
       function buildEncodedContent(rawText) {
-        return `${avatarToken(myAvatar)} ${rawText}`;
+        return rawText;
       }
 
       function parseEncodedMessage(content, pubkeyForFallback) {
         const text = content || "";
-        const match = text.match(AVATAR_TOKEN_RE);
-        if (!match) {
-          return {
-            cleanText: text,
-            avatar: fallbackAvatarFromPubkey(pubkeyForFallback),
-          };
-        }
-        const parsedAvatar = normalizeAvatarConfig({
-          e: match[1],
-          m: match[2],
-          hex: match[3],
-        });
+        const knownAvatar = avatarsByPubkey.get(pubkeyForFallback);
         return {
-          cleanText: text.slice(match[0].length),
-          avatar: parsedAvatar,
+          cleanText: text,
+          avatar: knownAvatar || fallbackAvatarFromPubkey(pubkeyForFallback),
         };
+      }
+
+      function parseAvatarEvent(event) {
+        const parsed = safeJsonParse(event?.content || "");
+        if (!parsed || typeof parsed !== "object") return null;
+        return normalizeAvatarConfig(parsed);
+      }
+
+      function applyAvatarEvent(event) {
+        if (!event?.pubkey) return;
+        const avatar = parseAvatarEvent(event);
+        if (!avatar) return;
+        const seenAt = avatarEventTimeByPubkey.get(event.pubkey) || 0;
+        const createdAt = event.created_at || 0;
+        if (createdAt < seenAt) return;
+        avatarEventTimeByPubkey.set(event.pubkey, createdAt);
+        avatarsByPubkey.set(event.pubkey, avatar);
+        if (event.pubkey === pubkey) {
+          myAvatar = avatar;
+          avatarEyesSelect.value = String(myAvatar.e);
+          avatarMouthSelect.value = String(myAvatar.m);
+          syncSlidersFromAvatar();
+          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
+          renderMyAvatarPreview();
+        }
+      }
+
+      function parseRoomStatsEvent(event) {
+        const roomId = getTag(event, "e", "channel")?.[1] || getChannelIdFromMessage(event);
+        if (!isValidRoomId(roomId)) return null;
+        const payload = safeJsonParse(event.content);
+        if (!payload || typeof payload !== "object") return null;
+        const msgCount = Number.parseInt(String(payload.msgCount), 10);
+        const windowSec = Number.parseInt(String(payload.windowSec), 10);
+        const ratePerHour = Number.parseFloat(String(payload.msgsPerHour));
+        const lastMessageId = typeof payload.lastMessageId === "string" ? payload.lastMessageId : "";
+        if (!Number.isFinite(msgCount) || msgCount < 0) return null;
+        if (!Number.isFinite(windowSec) || windowSec <= 0) return null;
+        const safeRate = Number.isFinite(ratePerHour) ? Math.max(0, ratePerHour) : (msgCount * 3600) / windowSec;
+        return {
+          roomId,
+          msgCount,
+          windowSec,
+          msgsPerHour: Math.round(safeRate),
+          lastMessageId,
+          createdAt: event.created_at || 0,
+        };
+      }
+
+      function applyRoomStatsEvent(event) {
+        const parsed = parseRoomStatsEvent(event);
+        if (!parsed) return;
+        const current = roomStatsByRoomId.get(parsed.roomId);
+        if (!current || parsed.createdAt >= current.createdAt) {
+          roomStatsByRoomId.set(parsed.roomId, parsed);
+          renderTopics();
+          if (currentChannelId === parsed.roomId) {
+            refreshLiveRateStatus();
+          }
+        }
+      }
+
+      function shouldEmitRoomStats(roomId) {
+        const existing = roomStatsByRoomId.get(roomId);
+        if (!existing?.lastMessageId) return true;
+        const ordered = sortedMessages();
+        if (!ordered.length) return true;
+        const oldestIds = ordered.slice(0, ROOM_STATS_OLDEST_SLICE).map((msg) => msg.id);
+        return oldestIds.includes(existing.lastMessageId) || !messagesById.has(existing.lastMessageId);
+      }
+
+      function buildRoomStatsPayload(roomId) {
+        const now = Math.floor(Date.now() / 1000);
+        const since = now - ROOM_STATS_WINDOW_SEC;
+        const roomMessages = sortedMessages().filter((msg) => getChannelIdFromMessage(msg.event) === roomId && (msg.event.created_at || 0) >= since);
+        const msgCount = roomMessages.length;
+        const lastMessageId = roomMessages.length ? roomMessages[roomMessages.length - 1].id : "";
+        const msgsPerHour = Math.round((msgCount * 3600) / ROOM_STATS_WINDOW_SEC);
+        return {
+          roomId,
+          msgCount,
+          windowSec: ROOM_STATS_WINDOW_SEC,
+          msgsPerHour,
+          lastMessageId,
+          ts: now,
+          app: APP_ROOM_MARKER_FIELD,
+        };
+      }
+
+      async function maybePublishRoomStats(roomId) {
+        if (!isValidRoomId(roomId)) return;
+        if (!shouldEmitRoomStats(roomId)) return;
+        const payload = buildRoomStatsPayload(roomId);
+        try {
+          const event = await publishEvent(
+            GIGACHAT_ROOM_STATS_KIND,
+            JSON.stringify(payload),
+            [["e", roomId, "", "channel"], ["client", "gigachat-web"], ["t", APP_ROOM_MARKER_TAG]],
+          );
+          applyRoomStatsEvent(event);
+        } catch (error) {
+          console.warn("Failed to publish room stats beacon", error);
+        }
       }
 
       function setupAvatarBuilder() {
@@ -3632,6 +4358,19 @@
         avatarHexInput.value = `#${myAvatar.hex}`;
       }
 
+      function renderAvatarDraftControls() {
+        if (!draftAvatar) draftAvatar = normalizeAvatarConfig(myAvatar);
+        avatarEyesSelect.value = String(draftAvatar.e);
+        avatarMouthSelect.value = String(draftAvatar.m);
+        const rgb = hexToRgb(draftAvatar.hex);
+        avatarRed.value = String(rgb.r);
+        avatarGreen.value = String(rgb.g);
+        avatarBlue.value = String(rgb.b);
+        avatarHexInput.value = `#${draftAvatar.hex}`;
+        avatarBeforePreview.innerHTML = avatarSvg(myAvatar);
+        avatarAfterPreview.innerHTML = avatarSvg(draftAvatar);
+      }
+
       function syncSlidersFromAvatar() {
         const rgb = hexToRgb(myAvatar.hex);
         avatarRed.value = String(rgb.r);
@@ -3642,10 +4381,13 @@
       function restoreAvatar() {
         const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.avatar) || "");
         if (saved) myAvatar = normalizeAvatarConfig(saved);
-        avatarEyesSelect.value = String(myAvatar.e);
-        avatarMouthSelect.value = String(myAvatar.m);
-        syncSlidersFromAvatar();
+        draftAvatar = normalizeAvatarConfig(myAvatar);
+        renderAvatarDraftControls();
         renderMyAvatarPreview();
+        if (pubkey) {
+          avatarsByPubkey.set(pubkey, myAvatar);
+          avatarEventTimeByPubkey.set(pubkey, Math.floor(Date.now() / 1000));
+        }
       }
 
       function parseRelayInput(value) {
@@ -3668,6 +4410,66 @@
 
       function currentNsec() {
         return localStorage.getItem(STORAGE_KEYS.nsec) || "";
+      }
+
+      function restoreBlockedPubkeys() {
+        const saved = safeJsonParse(localStorage.getItem(STORAGE_KEYS.blockedPubkeys) || "[]");
+        if (!Array.isArray(saved)) {
+          blockedPubkeys = new Set();
+          return;
+        }
+        blockedPubkeys = new Set(saved.filter((key) => typeof key === "string" && /^[0-9a-f]{64}$/i.test(key)));
+      }
+
+      function saveBlockedPubkeys() {
+        localStorage.setItem(STORAGE_KEYS.blockedPubkeys, JSON.stringify(Array.from(blockedPubkeys)));
+      }
+
+      function isBlockedPubkey(key) {
+        return typeof key === "string" && blockedPubkeys.has(key);
+      }
+
+      function blockPubkey(key) {
+        if (!key || isBlockedPubkey(key)) return;
+        blockedPubkeys.add(key);
+        saveBlockedPubkeys();
+        renderBlockedUsersList();
+        if (replyTarget && isBlockedPubkey(replyTarget.event.pubkey)) {
+          replyTarget = openThreadRootId && messagesById.has(openThreadRootId) ? messagesById.get(openThreadRootId) : null;
+          renderThreadReplyHint();
+        }
+        renderTopics();
+        renderMessages();
+        renderThread();
+      }
+
+      function unblockPubkey(key) {
+        if (!isBlockedPubkey(key)) return;
+        blockedPubkeys.delete(key);
+        saveBlockedPubkeys();
+        renderBlockedUsersList();
+        renderTopics();
+        renderMessages();
+        renderThread();
+      }
+
+      function renderBlockedUsersList() {
+        blockedUsersList.innerHTML = "";
+        const items = Array.from(blockedPubkeys).sort();
+        if (!items.length) {
+          blockedUsersList.innerHTML = '<div class="tiny">No blocked users.</div>';
+          return;
+        }
+        for (const key of items) {
+          const row = document.createElement("div");
+          row.className = "blocked-item";
+          row.innerHTML = `<code>${escapeHtml(guestHandleFromPubkey(key))}</code><button type="button" data-unblock-key="${key}">Unblock</button>`;
+          const button = row.querySelector("[data-unblock-key]");
+          if (button) {
+            button.addEventListener("click", () => unblockPubkey(key));
+          }
+          blockedUsersList.append(row);
+        }
       }
 
       function restorePinnedRooms() {
@@ -3704,6 +4506,13 @@
         return value === "off" ? "off" : "on";
       }
 
+      function sanitizeModerationMode(value) {
+        if (value === MODERATION_MODE_MINIMAL || value === MODERATION_MODE_BALANCED || value === MODERATION_MODE_MAX) {
+          return value;
+        }
+        return MODERATION_MODE_BALANCED;
+      }
+
       function applyProfanityDisplay(value) {
         const raw = String(value || "");
         if (profanityToggle === "off") return raw;
@@ -3715,7 +4524,21 @@
         }
       }
 
+      function applyLegacyAvatarCodeDisplay(value) {
+        const raw = String(value || "");
+        if (legacyAvatarCodeToggle !== "on") return raw;
+        return raw.replace(LEGACY_AVATAR_TOKEN_RE, "");
+      }
+
       async function initOptionalModerationDependencies() {
+        if (moderationMode === MODERATION_MODE_MINIMAL) {
+          moderationDependenciesLoaded = false;
+          renderTopics();
+          renderMessages();
+          renderThread();
+          return;
+        }
+        if (moderationDependenciesLoaded) return;
         try {
           const module = await import("https://esm.sh/bad-words@3.0.4");
           const Filter = module.default;
@@ -3759,23 +4582,81 @@
           console.warn("braille regex import failed; using built-in braille range fallback.", error);
         }
 
+        moderationDependenciesLoaded = true;
         renderTopics();
         renderMessages();
         renderThread();
       }
 
+      async function runFilterPackCheck(rawText, normalizedText) {
+        if (!filterPack || typeof filterPack.shouldBlock !== "function") return "";
+        try {
+          const verdict = await filterPack.shouldBlock({
+            rawText,
+            normalizedText,
+            roomId: currentChannelId,
+            pubkey,
+            mode: moderationMode,
+          });
+          if (typeof verdict === "string" && verdict.trim()) return verdict.trim();
+          if (verdict === true) return "client filter pack";
+          return "";
+        } catch (error) {
+          console.warn("Filter pack check failed", error);
+          return "";
+        }
+      }
+
+      async function loadFilterPackFromSource(sourceCode, sourceLabel = "saved pack") {
+        try {
+          const blobUrl = URL.createObjectURL(new Blob([sourceCode], { type: "text/javascript" }));
+          const module = await import(blobUrl);
+          URL.revokeObjectURL(blobUrl);
+          const candidate = module.default || module;
+          if (!candidate || typeof candidate.shouldBlock !== "function") {
+            filterPackStatus.textContent = "Pack loaded but missing shouldBlock().";
+            return false;
+          }
+          filterPack = candidate;
+          filterPackStatus.textContent = `Pack active from ${sourceLabel}.`;
+          return true;
+        } catch (error) {
+          console.warn("Failed loading filter pack module", error);
+          filterPackStatus.textContent = "Failed to load filter pack.";
+          return false;
+        }
+      }
+
+      async function restoreFilterPack() {
+        const savedUrl = localStorage.getItem(STORAGE_KEYS.filterPackUrl) || "";
+        filterPackUrlInput.value = savedUrl;
+        const savedSource = localStorage.getItem(STORAGE_KEYS.filterPackSource);
+        if (!savedSource) {
+          filterPackStatus.textContent = "No pack loaded.";
+          return;
+        }
+        await loadFilterPackFromSource(savedSource, savedUrl || "saved pack");
+      }
+
       function restoreProfanitySettings() {
+        moderationMode = sanitizeModerationMode(localStorage.getItem(STORAGE_KEYS.moderationMode));
+        moderationModeSelect.value = moderationMode;
         const currentValue = localStorage.getItem(STORAGE_KEYS.profanityToggle);
         profanityToggle = currentValue == null ? "on" : sanitizeProfanityToggle(currentValue);
         profanityToggleSelect.value = profanityToggle;
+        const legacyValue = localStorage.getItem(STORAGE_KEYS.legacyAvatarCodeToggle);
+        legacyAvatarCodeToggle = legacyValue == null ? "on" : sanitizeProfanityToggle(legacyValue);
+        legacyAvatarCodeToggleSelect.value = legacyAvatarCodeToggle;
       }
 
       function saveProfanitySettings() {
+        localStorage.setItem(STORAGE_KEYS.moderationMode, moderationMode);
         localStorage.setItem(STORAGE_KEYS.profanityToggle, profanityToggle);
+        localStorage.setItem(STORAGE_KEYS.legacyAvatarCodeToggle, legacyAvatarCodeToggle);
       }
 
       function sanitizeThemePreset(value) {
-        return Object.hasOwn(THEME_PRESETS, value) ? value : "sepia";
+        return Object.hasOwn(THEME_PRESETS, value) ? value : "night";
       }
 
       function applyThemePreset(presetName) {
@@ -3816,7 +4697,10 @@
         root.setProperty("--text", preset.text);
         root.setProperty("--muted", preset.muted);
         root.setProperty("--accent", preset.accent);
+        root.setProperty("--accent-soft", preset.accentSoft || "rgba(109, 139, 255, 0.14)");
         root.setProperty("--danger", preset.danger);
+        const isLight = preset === THEME_PRESETS.paper || preset === THEME_PRESETS.sepia;
+        document.documentElement.style.setProperty("color-scheme", isLight ? "light" : "dark");
       }
 
       function restoreThemePreset() {
@@ -3844,6 +4728,18 @@
         identityCode.textContent = guestHandleFromPubkey(pubkey);
       }
 
+      async function publishAvatarState() {
+        try {
+          await publishEvent(
+            GIGACHAT_AVATAR_KIND,
+            JSON.stringify(myAvatar),
+            [["client", "gigachat-web"], ["t", APP_ROOM_MARKER_TAG]],
+          );
+        } catch (error) {
+          console.warn("Failed to publish avatar state", error);
+        }
+      }
+
       function safeJsonParse(value) {
         try {
           return JSON.parse(value);
@@ -3864,6 +4760,7 @@
       }
 
       function getModerationBlockReason(value) {
+        if (moderationMode === MODERATION_MODE_MINIMAL) return "";
         const normalized = normalizeForModeration(value);
         if (!normalized) return "";
         if (isZalgoFn(value)) return "word-art spam filter";
@@ -3909,6 +4806,7 @@
       }
 
       async function shouldBlockByToxicityModel(value) {
+        if (moderationMode !== MODERATION_MODE_MAX) return false;
         const text = String(value || "").trim();
         if (!text) return false;
         try {
@@ -4011,6 +4909,7 @@
       function updateRoomStatsFromMessage(event) {
         const channelId = getChannelIdFromMessage(event);
         if (!channelId) return;
+        if (isBlockedPubkey(event.pubkey)) return;
         const current = roomStats.get(channelId) || { lastMessageAt: 0, messageCount: 0, lastMessagePreview: "" };
         const eventTime = event.created_at || 0;
         const parsed = parseEncodedMessage(event.content, event.pubkey);
@@ -4036,11 +4935,30 @@
         if (!roomIds.length) return;
         roomActivitySub = pool.subscribeMany(
           relays,
-          [{ kinds: [42], "#e": roomIds, limit: 1200 }],
+          [{ kinds: [42], "#e": roomIds, limit: 1200 }, { kinds: [GIGACHAT_ROOM_STATS_KIND], "#e": roomIds, limit: 1000 }],
           {
             onevent: (event) => {
+              if (event.kind === GIGACHAT_ROOM_STATS_KIND) {
+                applyRoomStatsEvent(event);
+                return;
+              }
               updateRoomStatsFromMessage(event);
               renderTopics();
+            },
+          },
+        );
+      }
+
+      function connectAvatarFeed() {
+        if (avatarSub) avatarSub.close();
+        avatarSub = pool.subscribeMany(
+          relays,
+          [{ kinds: [GIGACHAT_AVATAR_KIND], limit: 800 }],
+          {
+            onevent: (event) => {
+              applyAvatarEvent(event);
+              renderMessages();
+              renderThread();
             },
           },
         );
@@ -4062,8 +4980,9 @@
               scheduleActivityFeedRefresh();
             },
             oneose: () => {
-              setStatus("Live");
+              setStatus("Live", formatMessagesPerHourLabel(currentChannelId));
               connectRoomActivityFeed();
+              connectAvatarFeed();
             },
           },
         );
@@ -4110,7 +5029,7 @@
           button.className = `topic ${channel.id === currentChannelId ? "active" : ""}`;
           const stats = roomStats.get(channel.id);
           const previewRaw = stats?.lastMessagePreview ? stats.lastMessagePreview : "No messages yet";
-          const preview = applyProfanityDisplay(previewRaw);
+          const preview = applyProfanityDisplay(applyLegacyAvatarCodeDisplay(previewRaw));
           const previewText = preview.length > 40 ? `${preview.slice(0, 40)}...` : preview;
           const when = formatTopicTime(stats?.lastMessageAt || channel.created_at || 0);
           const pinLabel = isPinnedRoom(channel.id) ? "Unpin room" : "Pin room";
@@ -4155,6 +5074,7 @@
       }
 
       function normalizeMessage(event, channelId) {
+        if (isBlockedPubkey(event.pubkey)) return false;
         const parentId = getMessageParentId(event, channelId);
         const parsed = parseEncodedMessage(event.content, event.pubkey);
         if (getModerationBlockReason(parsed.cleanText)) return false;
@@ -4239,13 +5159,18 @@
         const channel = topicsById.get(channelId);
         topicName.textContent = channel ? parseTopicName(channel) : "Joined room";
         topicMeta.textContent = "Live room";
+        refreshLiveRateStatus();
 
         if (messageSub) messageSub.close();
         messageSub = pool.subscribeMany(
           relays,
-          [{ kinds: [42], "#e": [channelId], limit: MESSAGE_FETCH_LIMIT }],
+          [{ kinds: [42], "#e": [channelId], limit: MESSAGE_FETCH_LIMIT }, { kinds: [GIGACHAT_ROOM_STATS_KIND], "#e": [channelId], limit: 400 }],
           {
             onevent: (event) => {
+              if (event.kind === GIGACHAT_ROOM_STATS_KIND) {
+                applyRoomStatsEvent(event);
+                return;
+              }
               addLocalMessageEvent(event, channelId);
             },
           },
@@ -4359,6 +5284,10 @@
           .replaceAll(">", "&gt;");
       }
 
+      function userMenuHtml(pubkeyForMessage) {
+        return `<span class="message-user-menu" data-user-menu><button type="button" class="message-block" data-block-user="${escapeHtml(pubkeyForMessage)}" title="Hide this user locally">Block user</button></span>`;
+      }
+
       function renderMessages() {
         messagesEl.innerHTML = "";
 
@@ -4385,13 +5314,29 @@
 
           div.innerHTML = `
             <div class="message-meta">
-              <span class="message-author-wrap">${avatarHtml(message.avatar)}<span class="message-author">${guestHandleFromPubkey(message.event.pubkey)}</span></span>
-              <span class="message-time">${formatTime(message.event.created_at)}</span>
-              <button type="button" class="message-count" data-open-thread title="Open thread">${totalReplies} replies</button>
+              <span class="message-author-wrap" data-user-anchor>${avatarHtml(message.avatar)}<span class="message-author">${guestHandleFromPubkey(message.event.pubkey)}</span>${userMenuHtml(message.event.pubkey)}</span>
+              <span class="message-meta-left"><span class="message-time">${formatTime(message.event.created_at)}</span><button type="button" class="message-count" data-open-thread title="Open thread">${totalReplies} replies</button></span>
             </div>
-            <div class="message-content">${escapeHtml(applyProfanityDisplay(message.cleanContent))}</div>
+            <div class="message-content">${escapeHtml(applyProfanityDisplay(applyLegacyAvatarCodeDisplay(message.cleanContent)))}</div>
           `;
-
+          const userAnchor = div.querySelector("[data-user-anchor]");
+          const userMenu = div.querySelector("[data-user-menu]");
+          const blockButton = div.querySelector(`[data-block-user="${message.event.pubkey}"]`);
+          if (userAnchor && userMenu && blockButton) {
+            userAnchor.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              const wasOpen = userMenu.classList.contains("open");
+              document.querySelectorAll("[data-user-menu].open").forEach((menu) => menu.classList.remove("open"));
+              userMenu.classList.toggle("open", !wasOpen);
+            });
+            blockButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              blockPubkey(message.event.pubkey);
+              userMenu.classList.remove("open");
+            });
+          }
           div.querySelector("[data-open-thread]").addEventListener("click", () => {
             openThreadRootId = message.id;
             renderThread();
@@ -4448,16 +5393,35 @@
         const baseDepth = root.depth;
 
         const walk = (node, container) => {
+          if (isBlockedPubkey(node.event.pubkey)) return;
           const element = document.createElement("div");
           element.className = "thread-node";
           const localDepth = node.depth - baseDepth + 1;
           element.innerHTML = `
             <div class="message-meta">
-              <span class="message-author-wrap">${avatarHtml(node.avatar)}<span class="message-author">${guestHandleFromPubkey(node.event.pubkey)}</span></span>
+              <span class="message-author-wrap" data-user-anchor>${avatarHtml(node.avatar)}<span class="message-author">${guestHandleFromPubkey(node.event.pubkey)}</span>${userMenuHtml(node.event.pubkey)}</span>
               <span class="message-time">${formatTime(node.event.created_at)}</span>
             </div>
-            <div class="message-content">${escapeHtml(applyProfanityDisplay(node.cleanContent))}</div>
+            <div class="message-content">${escapeHtml(applyProfanityDisplay(applyLegacyAvatarCodeDisplay(node.cleanContent)))}</div>
           `;
+          const userAnchor = element.querySelector("[data-user-anchor]");
+          const userMenu = element.querySelector("[data-user-menu]");
+          const blockButton = element.querySelector(`[data-block-user="${node.event.pubkey}"]`);
+          if (userAnchor && userMenu && blockButton) {
+            userAnchor.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              const wasOpen = userMenu.classList.contains("open");
+              document.querySelectorAll("[data-user-menu].open").forEach((menu) => menu.classList.remove("open"));
+              userMenu.classList.toggle("open", !wasOpen);
+            });
+            blockButton.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              blockPubkey(node.event.pubkey);
+              userMenu.classList.remove("open");
+            });
+          }
           element.addEventListener("click", () => {
             if (localDepth >= 4) {
               alert("This thread is at the 4-level limit here.");
@@ -4544,6 +5508,11 @@
           alert(`Message blocked by ${blockReason}.`);
           return;
         }
+        const packReason = await runFilterPackCheck(rawContent, normalizeForModeration(rawContent));
+        if (packReason) {
+          alert(`Message blocked by ${packReason}.`);
+          return;
+        }
         const content = buildEncodedContent(rawContent);
         const event = buildSignedEvent(42, content, [["e", currentChannelId, "", "channel"]]);
         addLocalMessageEvent(event, currentChannelId);
@@ -4555,6 +5524,7 @@
           return;
         }
         publishSignedEvent(event);
+        maybePublishRoomStats(currentChannelId);
       }
 
       async function sendThreadMessage() {
@@ -4569,6 +5539,11 @@
         const blockReason = getModerationBlockReason(rawContent);
         if (blockReason) {
           alert(`Message blocked by ${blockReason}.`);
+          return;
+        }
+        const packReason = await runFilterPackCheck(rawContent, normalizeForModeration(rawContent));
+        if (packReason) {
+          alert(`Message blocked by ${packReason}.`);
           return;
         }
         if (replyTarget.depth >= 4) {
@@ -4590,6 +5565,7 @@
           return;
         }
         publishSignedEvent(event);
+        maybePublishRoomStats(currentChannelId);
       }
 
       function initEvents() {
@@ -4605,6 +5581,9 @@
         document.addEventListener("click", (event) => {
           const target = event.target;
           if (!(target instanceof Node)) return;
+          if (!(target instanceof Element) || !target.closest("[data-user-anchor]")) {
+            document.querySelectorAll("[data-user-menu].open").forEach((menu) => menu.classList.remove("open"));
+          }
           if (
             !messageEmojiPicker.contains(target) &&
             !messageEmojiToggle.contains(target) &&
@@ -4644,33 +5623,54 @@
           localStorage.removeItem(STORAGE_KEYS.nsec);
           secretKey = null;
           ensureIdentity();
+          avatarsByPubkey.set(pubkey, myAvatar);
+          avatarEventTimeByPubkey.set(pubkey, Math.floor(Date.now() / 1000));
+          publishAvatarState();
         });
 
         profileAvatarTrigger.addEventListener("click", () => {
+          draftAvatar = normalizeAvatarConfig(myAvatar);
+          renderAvatarDraftControls();
           avatarEditorPopover.classList.toggle("open");
         });
 
         const onAvatarChange = () => {
           const hex = rgbToHex(avatarRed.value, avatarGreen.value, avatarBlue.value);
-          myAvatar = normalizeAvatarConfig({
+          draftAvatar = normalizeAvatarConfig({
             e: avatarEyesSelect.value,
             m: avatarMouthSelect.value,
             hex,
           });
-          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
-          renderMyAvatarPreview();
+          avatarHexInput.value = `#${draftAvatar.hex}`;
+          avatarAfterPreview.innerHTML = avatarSvg(draftAvatar);
         };
         const onAvatarHexInput = () => {
-          const parsedHex = sanitizeHexColor(avatarHexInput.value, myAvatar.hex);
-          myAvatar = normalizeAvatarConfig({
+          const fallbackHex = draftAvatar?.hex || myAvatar.hex;
+          const parsedHex = sanitizeHexColor(avatarHexInput.value, fallbackHex);
+          draftAvatar = normalizeAvatarConfig({
             e: avatarEyesSelect.value,
             m: avatarMouthSelect.value,
             hex: parsedHex,
           });
-          syncSlidersFromAvatar();
-          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
-          renderMyAvatarPreview();
+          const rgb = hexToRgb(draftAvatar.hex);
+          avatarRed.value = String(rgb.r);
+          avatarGreen.value = String(rgb.g);
+          avatarBlue.value = String(rgb.b);
+          avatarHexInput.value = `#${draftAvatar.hex}`;
+          avatarAfterPreview.innerHTML = avatarSvg(draftAvatar);
         };
+        saveAvatarButton.addEventListener("click", () => {
+          if (!draftAvatar) return;
+          myAvatar = normalizeAvatarConfig(draftAvatar);
+          localStorage.setItem(STORAGE_KEYS.avatar, JSON.stringify(myAvatar));
+          avatarsByPubkey.set(pubkey, myAvatar);
+          avatarEventTimeByPubkey.set(pubkey, Math.floor(Date.now() / 1000));
+          renderMyAvatarPreview();
+          avatarBeforePreview.innerHTML = avatarSvg(myAvatar);
+          avatarAfterPreview.innerHTML = avatarSvg(myAvatar);
+          publishAvatarState();
+          avatarEditorPopover.classList.remove("open");
+        });
         avatarEyesSelect.addEventListener("change", onAvatarChange);
         avatarMouthSelect.addEventListener("change", onAvatarChange);
         avatarRed.addEventListener("input", onAvatarChange);
@@ -4690,10 +5690,53 @@
           renderMessages();
           renderThread();
         });
+        legacyAvatarCodeToggleSelect.addEventListener("change", () => {
+          legacyAvatarCodeToggle = sanitizeProfanityToggle(legacyAvatarCodeToggleSelect.value);
+          saveProfanitySettings();
+          renderTopics();
+          renderMessages();
+          renderThread();
+        });
         themePresetSelect.addEventListener("change", () => {
           themePreset = sanitizeThemePreset(themePresetSelect.value);
           localStorage.setItem(STORAGE_KEYS.themePreset, themePreset);
           applyThemePreset(themePreset);
+        });
+        moderationModeSelect.addEventListener("change", async () => {
+          moderationMode = sanitizeModerationMode(moderationModeSelect.value);
+          saveProfanitySettings();
+          if (moderationMode !== MODERATION_MODE_MINIMAL) {
+            await initOptionalModerationDependencies();
+          } else {
+            filterPackStatus.textContent = filterPack ? "Pack active (minimal mode)." : "No pack loaded.";
+          }
+        });
+        downloadFilterPackButton.addEventListener("click", async () => {
+          const sourceUrl = filterPackUrlInput.value.trim();
+          if (!sourceUrl) {
+            alert("Paste a filter pack URL first.");
+            return;
+          }
+          filterPackStatus.textContent = "Downloading pack...";
+          try {
+            const response = await fetch(sourceUrl, { cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const source = await response.text();
+            const loaded = await loadFilterPackFromSource(source, sourceUrl);
+            if (!loaded) return;
+            localStorage.setItem(STORAGE_KEYS.filterPackUrl, sourceUrl);
+            localStorage.setItem(STORAGE_KEYS.filterPackSource, source);
+          } catch (error) {
+            console.warn("Failed downloading filter pack", error);
+            filterPackStatus.textContent = "Failed to download pack.";
+          }
+        });
+        clearFilterPackButton.addEventListener("click", () => {
+          filterPack = null;
+          localStorage.removeItem(STORAGE_KEYS.filterPackUrl);
+          localStorage.removeItem(STORAGE_KEYS.filterPackSource);
+          filterPackUrlInput.value = "";
+          filterPackStatus.textContent = "No pack loaded.";
         });
 
         setupEmojiPicker(messageEmojiPicker, messageInput);
@@ -4758,6 +5801,31 @@
             document.execCommand("copy");
           }
         });
+        applyNsecButton.addEventListener("click", () => {
+          const candidate = setNsecInput.value.trim();
+          if (!candidate) {
+            alert("Paste an nsec key first.");
+            return;
+          }
+          try {
+            const decoded = nip19.decode(candidate);
+            if (decoded.type !== "nsec") {
+              alert("That key is not an nsec.");
+              return;
+            }
+            localStorage.setItem(STORAGE_KEYS.nsec, candidate);
+            secretKey = null;
+            ensureIdentity();
+            restoreAvatar();
+            avatarsByPubkey.set(pubkey, myAvatar);
+            avatarEventTimeByPubkey.set(pubkey, Math.floor(Date.now() / 1000));
+            publishAvatarState();
+            setNsecInput.value = "";
+            alert("Key applied. You're now using that saved identity.");
+          } catch {
+            alert("Invalid nsec key.");
+          }
+        });
         copyShareLink.addEventListener("click", async () => {
           if (!shareLinkInput.value) return;
           try {
@@ -4775,6 +5843,7 @@
         document.getElementById("reconnect").addEventListener("click", () => {
           connectTopics();
           if (currentChannelId) selectTopic(currentChannelId);
+          advancedCryptoPanel.open = false;
           advancedPanel.classList.remove("open");
         });
 
@@ -4788,6 +5857,7 @@
 
           document.getElementById("joinTopicId").value = "";
           selectTopic(id);
+          advancedCryptoPanel.open = false;
           advancedPanel.classList.remove("open");
         });
 
@@ -4828,14 +5898,22 @@
         ensureIdentity();
         setupAvatarBuilder();
         restoreAvatar();
+        publishAvatarState();
         loadRelays();
-        initOptionalModerationDependencies();
+        restoreBlockedPubkeys();
         restorePinnedRooms();
         restoreProfanitySettings();
+        restoreFilterPack();
         restoreThemePreset();
+        renderBlockedUsersList();
         initEvents();
         refreshSharePanel();
         connectTopics();
+        if (moderationMode !== MODERATION_MODE_MINIMAL) {
+          initOptionalModerationDependencies();
+        } else {
+          filterPackStatus.textContent = filterPack ? "Pack active (minimal mode)." : "No pack loaded.";
+        }
         const launchUrl = new URL(window.location.href);
         const shouldAutoPin = consumeAutoPinQueryParam(launchUrl);
         const roomFromUrl = launchUrl.searchParams.get("room");
