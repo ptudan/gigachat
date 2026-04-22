@@ -835,9 +835,9 @@
       .thread-overlay {
         position: absolute;
         right: 18px;
-        bottom: 100px;
+        bottom: 12px;
         width: min(520px, calc(100% - 36px));
-        max-height: 72vh;
+        max-height: min(84vh, calc(100% - 72px));
         border: 1px solid var(--border);
         background: var(--thread-overlay-bg);
         border-radius: var(--radius-lg);
@@ -876,11 +876,28 @@
 
       .thread-composer {
         border-top: 1px solid var(--border);
-        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
         background: var(--thread-composer-bg);
         position: sticky;
         bottom: 0;
         z-index: 6;
+      }
+
+      #messages,
+      .composer,
+      .header {
+        transition: opacity var(--transition);
+      }
+
+      body.thread-open #messages,
+      body.thread-open .composer,
+      body.thread-open .header {
+        opacity: 0.4;
+      }
+
+      body.thread-open #messages,
+      body.thread-open .composer {
+        pointer-events: none;
       }
 
       .emoji-toggle {
@@ -934,8 +951,8 @@
       }
 
       #threadMessageInput {
-        min-height: 40px;
-        max-height: 110px;
+        min-height: 78px;
+        max-height: 190px;
         overflow-y: auto;
       }
 
@@ -1216,6 +1233,16 @@
       }
 
       @media (max-width: 840px) {
+        #messageInput,
+        #threadMessageInput {
+          font-size: 16px;
+        }
+
+        #threadMessageInput {
+          min-height: 92px;
+          max-height: 230px;
+        }
+
         .app {
           display: block;
         }
@@ -1284,8 +1311,10 @@
         .thread-overlay {
           right: 12px;
           left: 12px;
+          top: 64px;
           width: auto;
-          bottom: 110px;
+          bottom: 12px;
+          max-height: none;
         }
 
         .header {
@@ -5281,7 +5310,11 @@
         updateRoomStatsFromMessage(event);
         pruneMessageCache();
         renderMessages();
-        renderThread();
+        if (openThreadRootId && isMessageInsideThread(event.id, openThreadRootId)) {
+          renderThread();
+        } else if (openThreadRootId) {
+          renderThreadReplyHint();
+        }
         renderTopics();
       }
 
@@ -5334,6 +5367,7 @@
         updateMobileView();
         replyTarget = null;
         openThreadRootId = null;
+        document.body.classList.remove("thread-open");
         threadOverlay.classList.remove("open");
         messagesById.clear();
         renderTopics();
@@ -5525,7 +5559,6 @@
             openThreadRootId = message.id;
             renderThread();
             setReplyTargetById(message.id);
-            threadMessageInput.focus();
           });
 
           messagesEl.append(div);
@@ -5550,8 +5583,11 @@
       function countDescendants(rootId, map) {
         let count = 0;
         const stack = [...(map.get(rootId) || [])];
+        const seen = new Set();
         while (stack.length) {
           const node = stack.pop();
+          if (!node || seen.has(node.id)) continue;
+          seen.add(node.id);
           count += 1;
           const children = map.get(node.id) || [];
           for (const child of children) stack.push(child);
@@ -5561,6 +5597,7 @@
 
       function renderThread() {
         if (!openThreadRootId || !messagesById.has(openThreadRootId)) {
+          document.body.classList.remove("thread-open");
           threadOverlay.classList.remove("open");
           threadBody.innerHTML = "";
           threadMessageInput.value = "";
@@ -5568,6 +5605,7 @@
           return;
         }
 
+        document.body.classList.add("thread-open");
         threadOverlay.classList.add("open");
         threadBody.innerHTML = "";
         renderThreadReplyHint();
@@ -5576,8 +5614,12 @@
         const root = messagesById.get(openThreadRootId);
         const baseDepth = root.depth;
 
-        const walk = (node, container) => {
+        const walk = (node, container, ancestry) => {
           if (isBlockedPubkey(node.event.pubkey)) return;
+          if (!node?.id) return;
+          if (ancestry.has(node.id)) return;
+          const nextAncestry = new Set(ancestry);
+          nextAncestry.add(node.id);
           const element = document.createElement("div");
           element.className = "thread-node";
           const localDepth = node.depth - baseDepth + 1;
@@ -5612,7 +5654,6 @@
               return;
             }
             setReplyTargetById(node.id);
-            threadMessageInput.focus();
           });
           container.append(element);
 
@@ -5622,12 +5663,12 @@
             wrapper.className = "thread-children";
             container.append(wrapper);
             for (const child of children) {
-              walk(child, wrapper);
+              walk(child, wrapper, nextAncestry);
             }
           }
         };
 
-        walk(root, threadBody);
+        walk(root, threadBody, new Set());
       }
 
       function buildSignedEvent(kind, content, tags) {
@@ -6065,7 +6106,6 @@
           if (!openThreadRootId || !messagesById.has(openThreadRootId)) return;
           replyTarget = messagesById.get(openThreadRootId);
           renderThreadReplyHint();
-          threadMessageInput.focus();
         });
 
         document.getElementById("closeThread").addEventListener("click", () => {
